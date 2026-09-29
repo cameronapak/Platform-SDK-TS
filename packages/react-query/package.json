@@ -1,0 +1,48 @@
+{
+  "name": "@cameronapak/platform-sdk-react-query",
+  "version": "0.1.0",
+  "description": "TanStack React Query add-on for the YouVersion Platform SDK experiment",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cameronapak/Platform-SDK-TS.git",
+    "directory": "packages/react-query"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
+    "prepack": "pnpm build"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "@cameronapak/platform-sdk": "^0.1.0",
+    "@tanstack/react-query": "^5.104.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@cameronapak/platform-sdk": "workspace:*",
+    "@tanstack/react-query": "5.104.0",
+    "@types/react": "^19.2.0",
+    "@types/react-test-renderer": "^19.1.0",
+    "react": "19.3.0",
+    "react-test-renderer": "19.3.0",
+    "typescript": "^6.0.0"
+  },
+  "packageManager": "pnpm@12.0.0"
+}

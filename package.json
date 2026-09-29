@@ -1,5 +1,5 @@
 {
-  "name": "@youversion/platform-sdk",
+  "name": "@cameronapak/platform-sdk",
   "version": "0.1.0",
   "description": "TypeScript SDK for the YouVersion Platform API",
   "license": "Apache-2.0",
@@ -23,11 +23,13 @@
   ],
   "scripts": {
     "generate": "node scripts/generate.mjs",
+    "generate:react-query": "node scripts/generate-react-query.mjs",
     "build": "rm -rf dist && tsc -p tsconfig.json && cp src/generated/sdk-map.json dist/generated/sdk-map.json",
+    "build:all": "pnpm build && pnpm --dir packages/react-query build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
-    "test": "pnpm build && node --test test/*.test.mjs",
-    "check": "pnpm typecheck && pnpm typecheck:test && pnpm test && pnpm pack --dry-run",
+    "test": "pnpm build:all && node --test test/*.test.mjs packages/react-query/test/*.test.mjs",
+    "check": "pnpm generate:react-query --check && pnpm build:all && pnpm typecheck && pnpm typecheck:test && pnpm --dir packages/react-query typecheck && pnpm --dir packages/react-query typecheck:test && node --test test/*.test.mjs packages/react-query/test/*.test.mjs && pnpm pack --dry-run && pnpm --dir packages/react-query pack --dry-run",
     "prepack": "pnpm build"
   },
   "engines": {
