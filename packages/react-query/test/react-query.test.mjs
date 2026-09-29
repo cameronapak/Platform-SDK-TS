@@ -101,6 +101,28 @@ test('uses parameter-sensitive snapshots and scope-isolated resource filters', a
   assert.equal(locked.queryKeyHashFn, undefined);
 });
 
+test('projects declared request fields before caching and execution', async () => {
+  let requestedUrl;
+  const platform = createPlatformQueries({
+    client: createClient(async (url) => {
+      requestedUrl = String(url);
+      return Response.json({ data: { id: 42, family: 'Platform Sans', variants: [] } });
+    }),
+    cacheScope: 'public|environment:test',
+  });
+  const request = {
+    font_id: 42,
+    headers: { Authorization: 'Bearer should-not-be-cached' },
+    callback: () => assert.fail('extra callbacks must not be used'),
+  };
+  const options = platform.fonts.resourceGet.queryOptions(request);
+
+  assert.deepEqual(options.queryKey[4], { font_id: 42 });
+  assert.equal(JSON.stringify(options.queryKey).includes('should-not-be-cached'), false);
+  await createQueryClient().fetchQuery(options);
+  assert.equal(new URL(requestedUrl).pathname, '/v1/fonts/42');
+});
+
 test('converts modeled empty query success to null', async () => {
   const platform = createPlatformQueries({
     client: createClient(async () => new Response(null, { status: 204 })),

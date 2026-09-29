@@ -153,6 +153,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles.collection_get",
     emptyAsNull: true,
+    requestProperties: ["all_available","language_ranges[]","license_id","page_size","fields[]","page_token"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["collectionGet"]>[0]>,
       requestOptions,
@@ -164,6 +165,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles.resource_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id_path"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["resourceGet"]>[0]>,
       requestOptions,
@@ -175,6 +177,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_books.collection_get",
     emptyAsNull: true,
+    requestProperties: ["bible_id_path","canon"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["booksCollectionGet"]>[0]>,
       requestOptions,
@@ -186,6 +189,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_books.resource_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id_path","book_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["booksResourceGet"]>[0]>,
       requestOptions,
@@ -197,6 +201,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_books_chapters.collection_get",
     emptyAsNull: true,
+    requestProperties: ["bible_id_path","book_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["booksChaptersCollectionGet"]>[0]>,
       requestOptions,
@@ -208,6 +213,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_books_chapters.resource_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id_path","book_id","chapter_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["booksChaptersResourceGet"]>[0]>,
       requestOptions,
@@ -219,6 +225,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_books_chapters_verses.collection_get",
     emptyAsNull: true,
+    requestProperties: ["bible_id_path","book_id","chapter_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["booksChaptersVersesCollectionGet"]>[0]>,
       requestOptions,
@@ -230,6 +237,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_books_chapters_verses.resource_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id_path","book_id","chapter_id","verse_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["booksChaptersVersesResourceGet"]>[0]>,
       requestOptions,
@@ -241,6 +249,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_index.collection_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id_path"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["indexCollectionGet"]>[0]>,
       requestOptions,
@@ -252,6 +261,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "bibles",
     operationId: "bibles_passages.resource_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id_path","passage_id_path","format","include_headings","include_notes"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["bibles"]["passagesResourceGet"]>[0]>,
       requestOptions,
@@ -273,6 +283,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "permissions",
     operationId: "v1.apps.permissions.collection_get",
     emptyAsNull: false,
+    requestProperties: ["app_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["permissions"]["v1AppsPermissionsCollectionGet"]>[0]>,
       requestOptions,
@@ -284,6 +295,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "apps",
     operationId: "v1.apps.resource_get",
     emptyAsNull: false,
+    requestProperties: ["app_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["apps"]["v1AppsResourceGet"]>[0]>,
       requestOptions,
@@ -303,6 +315,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "fonts",
     operationId: "v1.fonts.resource_get",
     emptyAsNull: false,
+    requestProperties: ["font_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["fonts"]["v1FontsResourceGet"]>[0]>,
       requestOptions,
@@ -314,6 +327,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "fonts",
     operationId: "v1.fonts.stylesheet_get",
     emptyAsNull: false,
+    requestProperties: ["font_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["fonts"]["v1FontsStylesheetGet"]>[0]>,
       requestOptions,
@@ -325,6 +339,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "highlights",
     operationId: "v1.highlights.collection_get",
     emptyAsNull: true,
+    requestProperties: ["bible_id","passage_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["highlights"]["v1HighlightsCollectionGet"]>[0]>,
       requestOptions,
@@ -356,6 +371,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "languages",
     operationId: "v1.languages.collection_get",
     emptyAsNull: true,
+    requestProperties: ["page_size","fields[]","page_token","country","bibles_available"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["languages"]["v1LanguagesCollectionGet"]>[0]>,
       requestOptions,
@@ -367,6 +383,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "languages",
     operationId: "v1.languages.resource_get",
     emptyAsNull: false,
+    requestProperties: ["language_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["languages"]["v1LanguagesResourceGet"]>[0]>,
       requestOptions,
@@ -378,6 +395,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "licenses",
     operationId: "v1.licenses.collection_get",
     emptyAsNull: false,
+    requestProperties: ["bible_id","developer_id","all_available"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["licenses"]["v1LicensesCollectionGet"]>[0]>,
       requestOptions,
@@ -389,6 +407,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "organizations",
     operationId: "v1.organizations.bibles.collection_get",
     emptyAsNull: false,
+    requestProperties: ["organization_id","page_size","fields[]","page_token"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["organizations"]["v1OrganizationsBiblesCollectionGet"]>[0]>,
       requestOptions,
@@ -400,6 +419,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "organizations",
     operationId: "v1.organizations.collection_get",
     emptyAsNull: true,
+    requestProperties: ["bible_ids[]","page_size","fields[]","page_token"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["organizations"]["v1OrganizationsCollectionGet"]>[0]>,
       requestOptions,
@@ -411,6 +431,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "organizations",
     operationId: "v1.organizations.resource_get",
     emptyAsNull: false,
+    requestProperties: ["organization_id"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["organizations"]["v1OrganizationsResourceGet"]>[0]>,
       requestOptions,
@@ -422,6 +443,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "searchQueries",
     operationId: "v1.search_queries.collection_get",
     emptyAsNull: true,
+    requestProperties: ["language_ranges[]","query","trending"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["searchQueries"]["v1SearchQueriesCollectionGet"]>[0]>,
       requestOptions,
@@ -433,6 +455,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "searchTopics",
     operationId: "v1.search_topics.collection_get",
     emptyAsNull: false,
+    requestProperties: ["query","language_ranges[]"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["searchTopics"]["v1SearchTopicsCollectionGet"]>[0]>,
       requestOptions,
@@ -444,6 +467,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "searchUnified",
     operationId: "v1.search_unified.collection_get",
     emptyAsNull: false,
+    requestProperties: ["query","bible_id","language_ranges[]","user_intent","fields[]"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["searchUnified"]["v1SearchUnifiedCollectionGet"]>[0]>,
       requestOptions,
@@ -455,6 +479,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "searchVerses",
     operationId: "v1.search_verses.collection_get",
     emptyAsNull: false,
+    requestProperties: ["query","bible_id","user_intent","page_size","page_token"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["searchVerses"]["v1SearchVersesCollectionGet"]>[0]>,
       requestOptions,
@@ -474,6 +499,7 @@ export function createPlatformQueries(options: CreatePlatformQueriesOptions): Pl
     resource: "verseOfTheDays",
     operationId: "v1.verse_of_the_days.canonical.resource_get",
     emptyAsNull: false,
+    requestProperties: ["day"],
     execute: (
       request: NonNullable<Parameters<YouVersionPlatformClient["verseOfTheDays"]["v1VerseOfTheDaysCanonicalResourceGet"]>[0]>,
       requestOptions,

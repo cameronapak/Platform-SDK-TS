@@ -63,19 +63,22 @@ function readOpenapiOperations(openapi) {
       if (operation.operationId == null) fail(`${method.toUpperCase()} ${path} has no operationId`);
       if (operations.has(operation.operationId)) fail(`duplicate operationId ${operation.operationId}`);
 
-      const parameters = [...(pathItem.parameters ?? []), ...(operation.parameters ?? [])]
-        .map((parameter) => {
+      const parameters = [...(pathItem.parameters ?? []), ...(operation.parameters ?? [])].map(
+        (parameter) => {
           if (parameter.$ref == null) return parameter;
           const name = parameter.$ref.split('/').at(-1);
           return openapi.components?.parameters?.[name] ?? fail(`unresolved parameter ${parameter.$ref}`);
-        })
-        .map((parameter) => parameter.name);
+        },
+      );
       const security = operation.security ?? openapi.security ?? [];
 
       operations.set(operation.operationId, {
         httpMethod: method.toUpperCase(),
         path,
-        parameters,
+        parameterNames: parameters.map((parameter) => parameter.name),
+        requestParameterNames: parameters
+          .filter((parameter) => parameter.in !== 'header')
+          .map((parameter) => parameter.name),
         emptySuccess: operation.responses?.['204'] != null,
         requiresOAuth: security.some((requirement) =>
           Object.prototype.hasOwnProperty.call(requirement, 'OAuth2'),
@@ -112,6 +115,33 @@ function requestMode(accessor, method, hasRequestType) {
   return /^request:[\s\S]*?= \{\},/m.test(parameters) ? 'optional' : 'required';
 }
 
+function requestProperties(accessor, requestType) {
+  if (requestType == null) return [];
+  const requestPath = join(
+    root,
+    'src',
+    'generated',
+    'api',
+    'resources',
+    accessor,
+    'client',
+    'requests',
+    `${requestType}.ts`,
+  );
+  const source = readFileSync(requestPath, 'utf8');
+  const escapedType = requestType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = source.match(new RegExp(`export interface ${escapedType} \\{([\\s\\S]*?)\\n\\}`));
+  if (match == null) fail(`could not read request properties for ${accessor}.${requestType}`);
+
+  const properties = [...match[1].matchAll(/^    (?:("(?:[^"\\]|\\.)+")|([A-Za-z_$][A-Za-z0-9_$]*))\??:/gm)].map(
+    ([, quoted, identifier]) => (quoted == null ? identifier : JSON.parse(quoted)),
+  );
+  if (new Set(properties).size !== properties.length) {
+    fail(`${accessor}.${requestType} has duplicate request properties`);
+  }
+  return properties;
+}
+
 function operationKind(operationId, httpMethod) {
   if (EXCLUSIONS.has(operationId)) return 'excluded';
   if (httpMethod === 'GET') return 'query';
@@ -140,14 +170,21 @@ function buildOperations(openapi, sdkMap) {
     const accessor = sdk.accessor[0];
     const kind = operationKind(operationId, sdk.httpMethod);
     const mode = requestMode(accessor, sdk.method, sdk.requestType != null);
+    const properties = requestProperties(accessor, sdk.requestType);
     if (kind === 'mutation' && mode !== 'required') {
       fail(`${operationId} has an unsupported ${mode} mutation request`);
     }
     if (
       kind === 'query' &&
-      contract.parameters.some((name) => CREDENTIAL_PARAMETER_NAMES.has(name.toLowerCase()))
+      contract.parameterNames.some((name) => CREDENTIAL_PARAMETER_NAMES.has(name.toLowerCase()))
     ) {
       fail(`${operationId} has a credential-bearing query parameter and needs an explicit policy`);
+    }
+    if (
+      kind === 'query' &&
+      JSON.stringify(properties.toSorted()) !== JSON.stringify(contract.requestParameterNames.toSorted())
+    ) {
+      fail(`${operationId} request type and OpenAPI parameters differ`);
     }
 
     return {
@@ -157,6 +194,7 @@ function buildOperations(openapi, sdkMap) {
       publicName: publicOperationName(accessor, sdk.method),
       kind,
       requestMode: mode,
+      requestProperties: properties,
       ...contract,
       exclusionReason: EXCLUSIONS.get(operationId),
     };
@@ -210,6 +248,7 @@ function bindingSource(operation) {
       );
       return `  const ${variable} = createRequestlessQueryBinding({\n${common.join('\n')}\n  });`;
     }
+    common.push(`    requestProperties: ${JSON.stringify(operation.requestProperties)},`);
     common.push(
       `    execute: (`,
       `      request: NonNullable<Parameters<${methodType(operation)}>[0]>,`,

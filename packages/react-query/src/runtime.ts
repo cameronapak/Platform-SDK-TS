@@ -51,7 +51,7 @@ type TaggedQueryKey<TRequest, TQueryFnData> = QueryKeyWithDataTag<
   PlatformQueryKey<TRequest>,
   TQueryFnData,
   DefaultError
->;
+>['queryKey'];
 
 type UndefinedBindingOptions<TQueryFnData, TData, TRequest> = WithSdkOptions<
   Omit<
@@ -172,11 +172,12 @@ export interface MutationBinding<TVariables, TData> {
   ): UseMutationResult<TData, DefaultError, TVariables, TOnMutateResult>;
 }
 
-interface QueryBindingConfig<TRequest, TResult, TEmptyAsNull extends boolean> {
+interface QueryBindingConfig<TRequest extends object, TResult, TEmptyAsNull extends boolean> {
   cacheScope: string;
   resource: string;
   operationId: string;
   emptyAsNull: TEmptyAsNull;
+  requestProperties: readonly (keyof TRequest)[];
   execute(request: TRequest, requestOptions: BaseRequestOptions): PromiseLike<TResult>;
 }
 
@@ -207,6 +208,17 @@ function cloneRequestValue<T>(value: T): T {
     ) as T;
   }
   return value;
+}
+
+function projectRequest<TRequest extends object>(
+  request: TRequest,
+  properties: readonly (keyof TRequest)[],
+): TRequest {
+  const projected: Partial<TRequest> = {};
+  for (const key of properties) {
+    if (key in request) projected[key] = cloneRequestValue(request[key]);
+  }
+  return projected as TRequest;
 }
 
 function requestOptions(sdk: SdkExecutionOptions | undefined, abortSignal?: AbortSignal): BaseRequestOptions {
@@ -266,7 +278,7 @@ function operationMutationKey(
   return [PLATFORM_QUERY_NAMESPACE, cacheScope, resource, operationId] as const;
 }
 
-function createQueryBinding<TRequest, TResult, TEmptyAsNull extends boolean>(
+function createQueryBinding<TRequest extends object, TResult, TEmptyAsNull extends boolean>(
   config: QueryBindingConfig<TRequest, TResult, TEmptyAsNull>,
 ) {
   type QueryResult = NormalizedQueryResult<TResult, TEmptyAsNull>;
@@ -279,7 +291,7 @@ function createQueryBinding<TRequest, TResult, TEmptyAsNull extends boolean>(
     request: TRequest,
     options?: UndefinedBindingOptions<QueryResult, TData, TRequest>,
   ): UndefinedBindingResult<QueryResult, TData, TRequest> => {
-    const snapshot = cloneRequestValue(request);
+    const snapshot = projectRequest(request, config.requestProperties);
     const [tanstackOptions, sdk] = splitQueryOptions(options);
     return queryOptions({
       ...tanstackOptions,
@@ -299,7 +311,7 @@ function createQueryBinding<TRequest, TResult, TEmptyAsNull extends boolean>(
         config.cacheScope,
         config.resource,
         config.operationId,
-        cloneRequestValue(request),
+        projectRequest(request, config.requestProperties),
       ) as unknown as TaggedQueryKey<TRequest, QueryResult>;
     },
     queryFilters,
@@ -314,7 +326,11 @@ function createQueryBinding<TRequest, TResult, TEmptyAsNull extends boolean>(
   } as RequiredQueryBinding<TRequest, QueryResult>;
 }
 
-export function createRequiredQueryBinding<TRequest, TResult, TEmptyAsNull extends boolean>(
+export function createRequiredQueryBinding<
+  TRequest extends object,
+  TResult,
+  TEmptyAsNull extends boolean,
+>(
   config: QueryBindingConfig<TRequest, TResult, TEmptyAsNull>,
 ): RequiredQueryBinding<TRequest, NormalizedQueryResult<TResult, TEmptyAsNull>> {
   return createQueryBinding(config);
@@ -359,6 +375,7 @@ export function createRequestlessQueryBinding<TResult, TEmptyAsNull extends bool
   type EmptyRequest = Record<string, never>;
   const binding = createQueryBinding<EmptyRequest, TResult, TEmptyAsNull>({
     ...config,
+    requestProperties: [],
     execute: (_request, options) => config.execute(options),
   });
   const emptyRequest: EmptyRequest = {};

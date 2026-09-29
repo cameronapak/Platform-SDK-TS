@@ -7,13 +7,29 @@ declare const client: YouVersionPlatformClient;
 declare const queryClient: QueryClient;
 
 const platform = createPlatformQueries({ client, cacheScope: 'user:1|locale:en' });
-const bibleRequest = { 'language_ranges[]': ['en', 'es'], page_size: 25 };
+const bibleRequest: YouVersionPlatform.BiblesCollectionGetRequest = {
+  'language_ranges[]': ['en', 'es'],
+};
 const bibleOptions = platform.bibles.collectionGet.queryOptions(bibleRequest);
 const cachedBibles = queryClient.getQueryData(bibleOptions.queryKey);
 const expectedCachedBibles:
   | YouVersionPlatform.BiblesCollectionGetResponse
   | null
   | undefined = cachedBibles;
+const standaloneBibleKey = platform.bibles.collectionGet.queryKey(bibleRequest);
+const directlyCachedBibles = queryClient.getQueryData(standaloneBibleKey);
+const expectedDirectlyCachedBibles:
+  | YouVersionPlatform.BiblesCollectionGetResponse
+  | null
+  | undefined = directlyCachedBibles;
+queryClient.setQueryData(standaloneBibleKey, (previous) => {
+  const typedPrevious:
+    | YouVersionPlatform.BiblesCollectionGetResponse
+    | null
+    | undefined = previous;
+  return typedPrevious ?? null;
+});
+queryClient.getQueriesData({ queryKey: standaloneBibleKey, exact: true });
 
 const selected = platform.bibles.collectionGet.useQuery(bibleRequest, {
   select: (response) => response?.total_size ?? 0,
@@ -56,5 +72,6 @@ platform.bibles.collectionGet.queryOptions(bibleRequest, { sdk: { headers: { foo
 platform.dataExchange.approvalGet;
 
 void expectedCachedBibles;
+void expectedDirectlyCachedBibles;
 void selectedData;
 void definedData;
