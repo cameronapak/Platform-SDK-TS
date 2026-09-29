@@ -28,6 +28,10 @@ _Avoid_: App key, data exchange token
 User-granted authority for an app to access a specific kind of user data, such as highlights.
 _Avoid_: OAuth scope, authorization
 
+**Cache scope**:
+A caller-chosen, non-secret identity and representation boundary that distinguishes cached Platform API results across users, tenants, apps, environments, or locales. It never contains credentials.
+_Avoid_: Access token, app key
+
 **Data exchange**:
 The browser approval flow in which a user reviews requested permissions and returns the result to an app.
 _Avoid_: OAuth flow, token exchange

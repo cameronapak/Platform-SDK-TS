@@ -276,4 +276,5 @@ run(
 rmSync(generated, { recursive: true, force: true });
 cpSync(join(output, 'sdk'), generated, { recursive: true });
 adaptGeneratedSdk(generated);
+run('node', [join(root, 'scripts', 'generate-react-query.mjs')], root);
 console.log(`Generated YouVersion Platform SDK at ${generated}`);

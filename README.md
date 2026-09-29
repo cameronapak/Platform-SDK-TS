@@ -23,7 +23,7 @@ pnpm build
 App-key endpoints only require your YouVersion Platform app key:
 
 ```ts
-import { YouVersionPlatformClient } from './dist/index.js';
+import { YouVersionPlatformClient } from '@cameronapak/platform-sdk';
 
 const youVersion = new YouVersionPlatformClient({
   yvpAppKey: process.env.YOUVERSION_APP_KEY!,
@@ -61,6 +61,37 @@ const callbackUrl = rawResponse.headers.get('location');
 
 The client also accepts `baseUrl`, `timeoutInSeconds`, `maxRetries`, custom headers, and a custom `fetch` implementation.
 
+## Use with TanStack React Query
+
+The sibling `@cameronapak/platform-sdk-react-query` package generates query keys, reusable options, and thin hooks from the same operation inventory as the SDK.
+
+```ts
+import { createPlatformQueries } from '@cameronapak/platform-sdk-react-query';
+
+const platform = createPlatformQueries({
+  client: youVersion,
+  // Non-secret identity and representation context. Never use credentials here.
+  cacheScope: `user:${userId}|locale:en|environment:production`,
+});
+
+const query = platform.bibles.collectionGet.useQuery({
+  'language_ranges[]': ['en'],
+  page_size: 25,
+});
+```
+
+Use the same options factory for server prefetching and the hook. Resource filters support broad, scope-safe invalidation:
+
+```ts
+await queryClient.prefetchQuery(
+  platform.bibles.collectionGet.queryOptions({ 'language_ranges[]': ['en'] }),
+);
+
+await queryClient.invalidateQueries(platform.highlights.queryFilters());
+```
+
+See [`packages/react-query/README.md`](packages/react-query/README.md) for retry, empty-response, SSR, and mutation-state boundaries.
+
 ## Regenerate
 
 Generation requires Node.js 22 or newer, pnpm, Git, and a running Docker daemon.
@@ -70,9 +101,10 @@ pnpm generate
 pnpm check
 ```
 
-The generator is pinned to a tested Forge commit and builds the standalone transformer from source. It applies two compatibility adaptations after Forge runs:
+The generator is pinned to a tested Forge commit and builds the standalone transformer from source. It applies compatibility adaptations after Forge runs:
 
 - Replace Forge's current Cloudflare-specific public names and response-envelope runtime with YouVersion equivalents.
 - Keep OAuth optional for app-key-only endpoints while using bearer authentication when `token` is supplied.
+- Generate the React Query add-on from the adapted SDK inventory and OpenAPI operation metadata.
 
 Generated source is committed under `src/generated`. The operation-to-method mapping is available at `src/generated/sdk-map.json`.
