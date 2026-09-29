@@ -1,0 +1,10 @@
+export type { BiblesBooksChaptersCollectionGetRequest } from "./BiblesBooksChaptersCollectionGetRequest.js";
+export type { BiblesBooksChaptersResourceGetRequest } from "./BiblesBooksChaptersResourceGetRequest.js";
+export type { BiblesBooksChaptersVersesCollectionGetRequest } from "./BiblesBooksChaptersVersesCollectionGetRequest.js";
+export type { BiblesBooksChaptersVersesResourceGetRequest } from "./BiblesBooksChaptersVersesResourceGetRequest.js";
+export type { BiblesBooksCollectionGetRequest } from "./BiblesBooksCollectionGetRequest.js";
+export type { BiblesBooksResourceGetRequest } from "./BiblesBooksResourceGetRequest.js";
+export type { BiblesCollectionGetRequest } from "./BiblesCollectionGetRequest.js";
+export type { BiblesIndexCollectionGetRequest } from "./BiblesIndexCollectionGetRequest.js";
+export type { BiblesPassagesResourceGetRequest } from "./BiblesPassagesResourceGetRequest.js";
+export type { BiblesResourceGetRequest } from "./BiblesResourceGetRequest.js";

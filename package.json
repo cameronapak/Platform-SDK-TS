@@ -1,0 +1,41 @@
+{
+  "name": "@youversion/platform-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the YouVersion Platform API",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cameronapak/Platform-SDK-TS.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./sdk-map.json": "./dist/generated/sdk-map.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "build": "rm -rf dist && tsc -p tsconfig.json && cp src/generated/sdk-map.json dist/generated/sdk-map.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
+    "test": "pnpm build && node --test test/*.test.mjs",
+    "check": "pnpm typecheck && pnpm typecheck:test && pnpm test && pnpm pack --dry-run",
+    "prepack": "pnpm build"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@12.0.0",
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "typescript": "^6.0.0"
+  }
+}
