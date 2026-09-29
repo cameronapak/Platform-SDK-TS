@@ -1,15 +1,21 @@
 # YouVersion Platform TypeScript SDK
 
-Typed, ESM-first client for the YouVersion Platform API. The SDK is generated from the bundled OpenAPI specification with [Cloudflare Forge](https://github.com/cloudflare/forge).
+> [!IMPORTANT]
+> This repository is an unofficial experiment. It is not an official or supported YouVersion SDK, it is not published as a package, and its API may change without notice.
+
+This experiment generates a typed, ESM-first client for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge).
 
 ## Requirements
 
 - Node.js 22 or newer
 
-## Install
+## Run locally
 
 ```sh
-pnpm add @youversion/platform-sdk
+git clone https://github.com/cameronapak/Platform-SDK-TS.git
+cd Platform-SDK-TS
+pnpm install
+pnpm build
 ```
 
 ## Use
@@ -17,7 +23,7 @@ pnpm add @youversion/platform-sdk
 App-key endpoints only require your YouVersion Platform app key:
 
 ```ts
-import { YouVersionPlatformClient } from '@youversion/platform-sdk';
+import { YouVersionPlatformClient } from './dist/index.js';
 
 const youVersion = new YouVersionPlatformClient({
   yvpAppKey: process.env.YOUVERSION_APP_KEY!,
@@ -64,9 +70,9 @@ pnpm generate
 pnpm check
 ```
 
-The generator is pinned to a tested Forge commit because Forge's standalone transformer is not yet published to npm. It applies two compatibility adaptations after Forge runs:
+The generator is pinned to a tested Forge commit and builds the standalone transformer from source. It applies two compatibility adaptations after Forge runs:
 
 - Replace Forge's current Cloudflare-specific public names and response-envelope runtime with YouVersion equivalents.
 - Keep OAuth optional for app-key-only endpoints while using bearer authentication when `token` is supplied.
 
-Generated source is committed under `src/generated`. The operation-to-method mapping is exported as `@youversion/platform-sdk/sdk-map.json`.
+Generated source is committed under `src/generated`. The operation-to-method mapping is available at `src/generated/sdk-map.json`.
