@@ -1,4 +1,4 @@
-# Python pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
+# Python and Go pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
 # TypeScript retains its existing Forge transformer in scripts/generate.mjs.
 api:
   specs:
@@ -23,3 +23,17 @@ groups:
           package_name: cameronapak_platform_sdk
           client:
             class_name: PlatformClient
+  go-sdk:
+    generators:
+      - name: fernapi/fern-go-sdk
+        version: 1.47.2
+        output:
+          location: local-file-system
+          path: ../.cache/go-generated
+        config:
+          module:
+            path: github.com/cameronapak/Platform-SDK-TS/packages/go
+            version: '1.24'
+          packageName: platform
+          clientName: PlatformClient
+          clientConstructorName: NewPlatformClient
