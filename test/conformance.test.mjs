@@ -44,7 +44,8 @@ test('installed npm artifact conforms to shared wire cases', async (t) => {
   const packDirectory = join(temporary, 'pack');
   const consumerDirectory = join(temporary, 'consumer');
   await execFileAsync('mkdir', ['-p', packDirectory, consumerDirectory]);
-  const { stdout } = await execFileAsync('pnpm', ['pack', '--pack-destination', packDirectory], { cwd: resolve('.') });
+  // Test entrypoints build first. Do not rebuild dist while sibling tests import it.
+  const { stdout } = await execFileAsync('npm', ['pack', '--ignore-scripts', '--pack-destination', packDirectory], { cwd: resolve('.') });
   const tarballName = stdout.trim().split('\n').at(-1);
   const tarball = resolve(packDirectory, tarballName);
   await execFileAsync('npm', ['init', '-y'], { cwd: consumerDirectory });
