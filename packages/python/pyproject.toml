@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cameronapak-platform-sdk"
+version = "0.1.0"
+description = "Experimental Python SDK for the YouVersion Platform API"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Cameron Pak" }]
+dependencies = [
+  "anyio>=4.15.1,<5",
+  "httpx>=0.28.1,<0.29",
+  "pydantic>=2.13.5,<3",
+  "typing-extensions>=4.16.0,<5",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Typing :: Typed",
+]
+
+[dependency-groups]
+dev = [
+  "build>=1.3.0",
+  "hatchling>=1.27,<2",
+  "mypy>=1.18.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cameronapak_platform_sdk"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/cameronapak_platform_sdk", "README.md", "pyproject.toml", "LICENSE"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true

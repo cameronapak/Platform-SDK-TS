@@ -1,0 +1,25 @@
+# Python pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
+# TypeScript retains its existing Forge transformer in scripts/generate.mjs.
+api:
+  specs:
+    - openapi: ../.cache/openapi.fern.json
+      settings:
+        only-include-referenced-schemas: false
+        object-query-parameters: true
+        respect-nullable-schemas: true
+        coerce-enums-to-literals: true
+        path-parameter-order: url-order
+        resolve-schema-collisions: true
+default-group: python-sdk
+groups:
+  python-sdk:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 5.18.1
+        output:
+          location: local-file-system
+          path: ../.cache/python-generated
+        config:
+          package_name: cameronapak_platform_sdk
+          client:
+            class_name: PlatformClient
