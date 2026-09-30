@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# The orb already supplies Node, pnpm, uv, and Docker. Persist the missing Go
+# toolchain so generation and consumer checks also work in fresh orbs.
+version=go1.27.1
+if ! command -v go >/dev/null || [[ "$(go version)" != "go version $version linux/amd64" ]]; then
+  archive=$(mktemp)
+  trap 'rm -f "$archive"' EXIT
+  curl -fsSL "https://go.dev/dl/$version.linux-amd64.tar.gz" -o "$archive"
+  echo "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445  $archive" | sha256sum --check
+  sudo rm -rf /usr/local/go
+  sudo tar -xzf "$archive" -C /usr/local
+  sudo ln -sf /usr/local/go/bin/go /usr/local/bin/go
+  sudo ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+fi
+go version
+pnpm install --frozen-lockfile
+go -C packages/go mod download
+uv sync --project packages/python --frozen --no-install-project
