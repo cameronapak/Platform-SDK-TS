@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	internal "github.com/cameronapak/Platform-SDK-TS/packages/go/internal"
 	big "math/big"
+	strconv "strconv"
 )
 
 var (
@@ -2672,6 +2673,9 @@ func NewBiblesCollectionGetRequestPageSizeFromString(s string) (BiblesCollection
 	switch s {
 	case "*":
 		return BiblesCollectionGetRequestPageSizeAll, nil
+	}
+	if size, err := strconv.Atoi(s); err == nil && size >= 1 && size <= 99 {
+		return BiblesCollectionGetRequestPageSize(s), nil
 	}
 	var t BiblesCollectionGetRequestPageSize
 	return "", fmt.Errorf("%s is not a valid %T", s, t)

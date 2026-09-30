@@ -70,7 +70,7 @@ export function adaptGo(directory) {
     source = source.replace(/func \(r \*RawClient\) Approval(Get|Post)\([\s\S]*?(?=\nfunc |$)/g, (block, verb) => {
       count++;
       block = replace(block, 'r.options.ToHeader(options, true)',
-        `r.options.ToHeader(options, ${verb === 'Get' ? 'false' : 'request == nil || request.Token == nil'})`);
+        `r.options.ToHeader(options, ${verb === 'Get' ? 'false' : '(request == nil || request.Token == nil) && len(options.QueryParameters["token"]) == 0'})`);
       return replace(block, '\t\t\tURL:             endpointURL,',
         '\t\t\tURL:             endpointURL,\n\t\t\tManualRedirect:  true,');
     });
@@ -95,6 +95,22 @@ export function adaptGo(directory) {
     return replace(source, 'url.PathEscape(fmt.Sprintf("%v", value))',
       'strings.ReplaceAll(url.QueryEscape(fmt.Sprintf("%v", value)), "+", "%20")');
   });
+
+  const pageSizes = {
+    bibles: ['BiblesCollectionGetRequestPageSize'],
+    languages: ['V1LanguagesCollectionGetRequestPageSize'],
+    organizations: ['V1OrganizationsBiblesCollectionGetRequestPageSize', 'V1OrganizationsCollectionGetRequestPageSize'],
+  };
+  for (const [file, types] of Object.entries(pageSizes)) {
+    edit(`${file}.go`, (source, replace) => {
+      source = replace(source, '\tfmt "fmt"', '\tfmt "fmt"\n\tstrconv "strconv"');
+      for (const type of types) {
+        source = replace(source, `\tvar t ${type}\n\treturn "", fmt.Errorf`,
+          `\tif size, err := strconv.Atoi(s); err == nil && size >= 1 && size <= 99 {\n\t\treturn ${type}(s), nil\n\t}\n\tvar t ${type}\n\treturn "", fmt.Errorf`);
+      }
+      return source;
+    });
+  }
 
   edit('internal/caller.go', (source, replace) => {
     source = replace(source, '\turl := buildURL(params.URL, params.QueryParameters)', '\trequestURL := buildURL(params.URL, params.QueryParameters)');
@@ -126,6 +142,22 @@ export function adaptGo(directory) {
     // The final attempt returns immediately through Caller, without sleeping again.
     source = replace(source, 'if r.shouldRetry(response) {',
       'if r.shouldRetry(response) && retryAttempt+1 < maxRetryAttempts {');
+    source = replace(source, `	if retryAttempt > 63 { // 2^63+ would overflow uint64
+		retryAttempt = 63
+	}
+
+	delay := minRetryDelay << retryAttempt
+	if delay > maxRetryDelay {
+		delay = maxRetryDelay
+	}`, `	delay := minRetryDelay
+	for attempt := uint(0); attempt < retryAttempt; attempt++ {
+		// Saturate before multiplying so large retry limits cannot overflow.
+		if delay > maxRetryDelay/2 {
+			delay = maxRetryDelay
+			break
+		}
+		delay *= 2
+	}`);
     return replace(source, '\t\ttime.Sleep(delay)', `		timer := time.NewTimer(delay)
 		defer timer.Stop()
 		select {

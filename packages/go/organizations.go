@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	internal "github.com/cameronapak/Platform-SDK-TS/packages/go/internal"
 	big "math/big"
+	strconv "strconv"
 )
 
 type V1OrganizationsBiblesCollectionGetRequestPageSize string
@@ -19,6 +20,9 @@ func NewV1OrganizationsBiblesCollectionGetRequestPageSizeFromString(s string) (V
 	switch s {
 	case "*":
 		return V1OrganizationsBiblesCollectionGetRequestPageSizeAll, nil
+	}
+	if size, err := strconv.Atoi(s); err == nil && size >= 1 && size <= 99 {
+		return V1OrganizationsBiblesCollectionGetRequestPageSize(s), nil
 	}
 	var t V1OrganizationsBiblesCollectionGetRequestPageSize
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -443,6 +447,9 @@ func NewV1OrganizationsCollectionGetRequestPageSizeFromString(s string) (V1Organ
 	switch s {
 	case "*":
 		return V1OrganizationsCollectionGetRequestPageSizeAll, nil
+	}
+	if size, err := strconv.Atoi(s); err == nil && size >= 1 && size <= 99 {
+		return V1OrganizationsCollectionGetRequestPageSize(s), nil
 	}
 	var t V1OrganizationsCollectionGetRequestPageSize
 	return "", fmt.Errorf("%s is not a valid %T", s, t)

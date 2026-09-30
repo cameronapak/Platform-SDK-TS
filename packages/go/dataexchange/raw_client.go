@@ -102,7 +102,7 @@ func (r *RawClient) ApprovalPost(
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
 	}
-	headers, err := r.options.ToHeader(options, request == nil || request.Token == nil)
+	headers, err := r.options.ToHeader(options, (request == nil || request.Token == nil) && len(options.QueryParameters["token"]) == 0)
 	if err != nil {
 		return nil, err
 	}

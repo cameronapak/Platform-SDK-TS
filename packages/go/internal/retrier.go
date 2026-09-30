@@ -224,13 +224,14 @@ func (r *Retrier) retryDelay(response *http.Response, retryAttempt uint) (time.D
 // exponentialBackoff calculates the delay time based on the retry attempt
 // and applies symmetric jitter (±10% around the delay).
 func (r *Retrier) exponentialBackoff(retryAttempt uint) (time.Duration, error) {
-	if retryAttempt > 63 { // 2^63+ would overflow uint64
-		retryAttempt = 63
-	}
-
-	delay := minRetryDelay << retryAttempt
-	if delay > maxRetryDelay {
-		delay = maxRetryDelay
+	delay := minRetryDelay
+	for attempt := uint(0); attempt < retryAttempt; attempt++ {
+		// Saturate before multiplying so large retry limits cannot overflow.
+		if delay > maxRetryDelay/2 {
+			delay = maxRetryDelay
+			break
+		}
+		delay *= 2
 	}
 
 	return r.addSymmetricJitter(delay)

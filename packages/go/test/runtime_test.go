@@ -66,6 +66,93 @@ func TestTokenSupplierSuppressionFailureAndOverrides(t *testing.T) {
 	}
 }
 
+func TestApprovalPostQueryTokenSuppressesBearer(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		values   []string
+		supplier bool
+		suppress bool
+	}{
+		{"static-token", []string{"exchange+/="}, false, true},
+		{"failing-supplier", []string{"exchange+/="}, true, true},
+		{"empty-token-value", []string{""}, true, true},
+		{"nil-values", nil, true, false},
+		{"empty-values", []string{}, true, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var requests, tokens atomic.Int32
+			query := url.Values{"token": tc.values}
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				requests.Add(1)
+				if r.URL.RawQuery != query.Encode() {
+					t.Errorf("query: %s, want %s", r.URL.RawQuery, query.Encode())
+				}
+				if auth := r.Header.Get("Authorization"); auth != "" {
+					t.Errorf("approval emitted bearer auth: %q", auth)
+				}
+				w.Header().Set("Location", "/callback")
+				w.WriteHeader(http.StatusSeeOther)
+			}))
+			defer server.Close()
+			unavailable := errors.New("token unavailable")
+			var auth option.RequestOption = option.WithToken("must-not-leak")
+			if tc.supplier {
+				auth = option.WithTokenFunc(func() (string, error) {
+					tokens.Add(1)
+					return "", unavailable
+				})
+			}
+			c := client.NewPlatformClient(option.WithBaseURL(server.URL), option.WithYvpAppKey("app-key"), auth,
+				option.WithHTTPHeader(http.Header{"authorization": {"Bearer must-not-leak"}}), option.WithoutRetries())
+			err := c.DataExchange.ApprovalPost(context.Background(), &platform.DataExchangeApprovalPostRequest{},
+				option.WithQueryParameters(query))
+			if tc.suppress {
+				if err != nil || requests.Load() != 1 || tokens.Load() != 0 {
+					t.Fatalf("approval: %v, requests=%d, supplier calls=%d", err, requests.Load(), tokens.Load())
+				}
+			} else if !errors.Is(err, unavailable) || requests.Load() != 0 || tokens.Load() != 1 {
+				t.Fatalf("tokenless approval: %v, requests=%d, supplier calls=%d", err, requests.Load(), tokens.Load())
+			}
+		})
+	}
+}
+
+func TestPageSizeConstructors(t *testing.T) {
+	constructors := map[string]func(string) (string, error){
+		"bibles": func(s string) (string, error) {
+			value, err := platform.NewBiblesCollectionGetRequestPageSizeFromString(s)
+			return string(value), err
+		},
+		"languages": func(s string) (string, error) {
+			value, err := platform.NewV1LanguagesCollectionGetRequestPageSizeFromString(s)
+			return string(value), err
+		},
+		"organization-bibles": func(s string) (string, error) {
+			value, err := platform.NewV1OrganizationsBiblesCollectionGetRequestPageSizeFromString(s)
+			return string(value), err
+		},
+		"organizations": func(s string) (string, error) {
+			value, err := platform.NewV1OrganizationsCollectionGetRequestPageSizeFromString(s)
+			return string(value), err
+		},
+	}
+	for name, construct := range constructors {
+		t.Run(name, func(t *testing.T) {
+			for _, size := range []string{"*", "1", "25", "99", "+25", "025"} {
+				value, err := construct(size)
+				if err != nil || value != size {
+					t.Errorf("valid page size %q: value=%q, err=%v", size, value, err)
+				}
+			}
+			for _, size := range []string{"", "0", "100", "-1", "1.5", "all", " 25", "99999999999999999999"} {
+				if value, err := construct(size); err == nil {
+					t.Errorf("invalid page size %q accepted as %q", size, value)
+				}
+			}
+		})
+	}
+}
+
 func TestRetryLimitsBodyReplayAndClientDefaults(t *testing.T) {
 	var requests atomic.Int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

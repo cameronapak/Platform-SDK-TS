@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	internal "github.com/cameronapak/Platform-SDK-TS/packages/go/internal"
 	big "math/big"
+	strconv "strconv"
 )
 
 type V1LanguagesCollectionGetRequestPageSize string
@@ -19,6 +20,9 @@ func NewV1LanguagesCollectionGetRequestPageSizeFromString(s string) (V1Languages
 	switch s {
 	case "*":
 		return V1LanguagesCollectionGetRequestPageSizeAll, nil
+	}
+	if size, err := strconv.Atoi(s); err == nil && size >= 1 && size <= 99 {
+		return V1LanguagesCollectionGetRequestPageSize(s), nil
 	}
 	var t V1LanguagesCollectionGetRequestPageSize
 	return "", fmt.Errorf("%s is not a valid %T", s, t)

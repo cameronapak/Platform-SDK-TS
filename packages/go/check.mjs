@@ -16,7 +16,8 @@ function run(command, args, cwd = sdk) {
 }
 try {
   cpSync(source, sdk, { recursive: true, filter: (path) => path !== join(source, 'test') && !path.endsWith('.mjs') });
-  cpSync(join(source, 'test'), consumer, { recursive: true });
+  cpSync(join(source, 'test'), consumer, { recursive: true, filter: (path) => path !== join(source, 'test/internal') });
+  cpSync(join(source, 'test/internal'), join(sdk, 'internal'), { recursive: true });
   const formatting = execFileSync('gofmt', ['-l', sdk, consumer], { env, encoding: 'utf8' });
   if (formatting.trim()) throw new Error(`Go source needs formatting:\n${formatting}`);
   const module = readFileSync(join(sdk, 'go.mod'));
@@ -28,6 +29,7 @@ try {
   run('go', ['mod', 'verify']);
   run('go', ['build', './...']);
   run('go', ['vet', './...']);
+  run('go', ['test', '-race', '-count=1', '-timeout=60s', '-v', './internal']);
   run('go', ['mod', 'edit', `-replace=github.com/cameronapak/Platform-SDK-TS/packages/go=${sdk}`], consumer);
   run('go', ['mod', 'tidy'], consumer);
   const installed = JSON.parse(execFileSync('go', ['list', '-m', '-json', 'github.com/cameronapak/Platform-SDK-TS/packages/go'], { cwd: consumer, env, encoding: 'utf8' }));
