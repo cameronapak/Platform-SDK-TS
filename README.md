@@ -1,4 +1,4 @@
-# Platform SDK experiments
+# Unofficial YouVersion Platform SDKs
 
 > [!IMPORTANT]
 > This is Cameron Pak's personal project exploring Cloudflare Forge. Cameron contracts for YouVersion, but this project is not a YouVersion project or an official or supported YouVersion SDK. It is not published as a package, and its API may change without notice.
@@ -14,8 +14,8 @@ This repository explores language SDK generation for the YouVersion Platform API
 ## Run locally
 
 ```sh
-git clone https://github.com/cameronapak/Platform-SDK-TS.git
-cd Platform-SDK-TS
+git clone https://github.com/cameronapak/Unofficial-YouVersion-Platform-SDKs.git
+cd Unofficial-YouVersion-Platform-SDKs
 pnpm install
 pnpm build
 ```
