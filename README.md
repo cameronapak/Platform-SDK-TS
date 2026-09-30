@@ -1,13 +1,14 @@
-# YouVersion Platform TypeScript SDK
+# Platform SDK experiments
 
 > [!IMPORTANT]
-> This repository is an unofficial experiment. It is not an official or supported YouVersion SDK, it is not published as a package, and its API may change without notice.
+> This is Cameron Pak's personal project exploring Cloudflare Forge. Cameron contracts for YouVersion, but this project is not a YouVersion project or an official or supported YouVersion SDK. It is not published as a package, and its API may change without notice.
 
-This experiment generates a typed, ESM-first client for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge).
+This repository explores language SDK generation for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge). It contains TypeScript and Python Platform SDKs and a TypeScript React Query SDK add-on.
 
 ## Requirements
 
-- Node.js 22 or newer
+- TypeScript: Node.js 22 or newer and pnpm.
+- Python: Python 3.11 or newer and uv. See the [Python setup and usage](packages/python/README.md).
 
 ## Run locally
 
@@ -92,13 +93,26 @@ await queryClient.invalidateQueries(platform.highlights.queryFilters());
 
 See [`packages/react-query/README.md`](packages/react-query/README.md) for retry, empty-response, SSR, and mutation-state boundaries.
 
-## Regenerate
+## Use Python
+
+The unpublished `cameronapak-platform-sdk` distribution exports `PlatformClient` and `AsyncPlatformClient` from `cameronapak_platform_sdk`. Build a local wheel:
+
+```sh
+uv build packages/python --out-dir packages/python/dist
+```
+
+See the [Python README](packages/python/README.md) for installation, sync and async clients, transport cleanup, and manual pagination.
+
+## Regenerate and verify
 
 Generation requires Node.js 22 or newer, pnpm, Git, and a running Docker daemon.
 
 ```sh
 pnpm generate
 pnpm check
+pnpm generate:python
+pnpm check:python-generated
+pnpm check:python
 ```
 
 The generator is pinned to a tested Forge commit and builds the standalone transformer from source. It applies compatibility adaptations after Forge runs:
@@ -107,4 +121,6 @@ The generator is pinned to a tested Forge commit and builds the standalone trans
 - Keep OAuth optional for app-key-only endpoints while using bearer authentication when `token` is supplied.
 - Generate the React Query add-on from the adapted SDK inventory and OpenAPI operation metadata.
 
-Generated source is committed under `src/generated`. The operation-to-method mapping is available at `src/generated/sdk-map.json`.
+TypeScript generated source is tracked under `src/generated`, with its operation-to-method mapping at `src/generated/sdk-map.json`. Python generated source and its mapping are tracked under `packages/python/src/cameronapak_platform_sdk`. Root `fern/` pins Python generation; shared preparation uses a temporary copy of the authoritative OpenAPI document.
+
+Both installed packages consume the [shared wire conformance cases](test/conformance/README.md), covering every OpenAPI operation with local HTTP requests. Python runs the cases on both client surfaces. Language validation runs independently in CI; nothing publishes the packages or calls the live YouVersion Platform API.

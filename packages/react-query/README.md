@@ -1,7 +1,7 @@
 # Platform SDK React Query add-on
 
 > [!IMPORTANT]
-> This package is an unofficial experiment. It is not an official or supported YouVersion SDK and is not published.
+> This package is part of Cameron Pak's personal Cloudflare Forge experiment. It is not a YouVersion project or an official or supported YouVersion SDK and is not published.
 
 This package generates TanStack React Query bindings for `@cameronapak/platform-sdk`. See the repository README for setup and usage.
 

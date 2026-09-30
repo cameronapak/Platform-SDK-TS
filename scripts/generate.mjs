@@ -11,6 +11,7 @@ import {
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { prepareOpenapi, replaceExactly } from './generation.mjs';
 
 const FORGE_REPOSITORY = 'https://github.com/cloudflare/forge.git';
 const FORGE_COMMIT = '00b8ede867530f8891fe4124b2f5f20ee8d0b05e';
@@ -23,29 +24,6 @@ const generated = join(root, 'src', 'generated');
 
 function run(command, args, cwd = root) {
   execFileSync(command, args, { cwd, stdio: 'inherit' });
-}
-
-function stringifyQueryExamples(value) {
-  if (Array.isArray(value)) {
-    value.forEach(stringifyQueryExamples);
-    return;
-  }
-  if (value === null || typeof value !== 'object') return;
-  if (value.in === 'query' && value.schema) {
-    const schemas = [value.schema, ...(value.schema.anyOf ?? [])];
-    for (const schema of schemas) {
-      if (typeof schema.example === 'number') schema.example = String(schema.example);
-    }
-  }
-  Object.values(value).forEach(stringifyQueryExamples);
-}
-
-function replaceExactly(source, search, replacement, expected, file) {
-  const matches = source.split(search).length - 1;
-  if (matches !== expected) {
-    throw new Error(`Expected ${expected} generation pattern(s) in ${file}, found ${matches}`);
-  }
-  return source.replaceAll(search, replacement);
 }
 
 function adaptMethod(source, method, transform, file) {
@@ -262,10 +240,7 @@ cpSync(spec, join(forge, 'openapi.json'));
 cpSync(spec, join(forge, 'packages', 'cloudflare-fern-config', 'fern', 'openapi.json'));
 
 run('pnpm', ['--filter', '@cloudflare/forge-transformer-sdk-ts', 'build'], forge);
-const openapi = JSON.parse(readFileSync(spec, 'utf8'));
-stringifyQueryExamples(openapi);
-mkdirSync(dirname(forgeSpec), { recursive: true });
-writeFileSync(forgeSpec, `${JSON.stringify(openapi, null, 2)}\n`);
+prepareOpenapi(spec, forgeSpec);
 rmSync(output, { recursive: true, force: true });
 run(
   'node',

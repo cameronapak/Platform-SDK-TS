@@ -24,6 +24,9 @@
   "scripts": {
     "generate": "node scripts/generate.mjs",
     "generate:react-query": "node scripts/generate-react-query.mjs",
+    "generate:python": "node scripts/generate-python.mjs",
+    "check:python-generated": "node scripts/generate-python.mjs --check",
+    "check:python": "uv sync --project packages/python --frozen --no-install-project && uv run --project packages/python --no-sync python packages/python/check.py",
     "build": "rm -rf dist && tsc -p tsconfig.json && cp src/generated/sdk-map.json dist/generated/sdk-map.json",
     "build:all": "pnpm build && pnpm --dir packages/react-query build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
