@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > This is Cameron Pak's personal project exploring Cloudflare Forge. Cameron contracts for YouVersion, but this project is not a YouVersion project or an official or supported YouVersion SDK. It is not published as a package, and its API may change without notice.
 
-This repository explores language SDK generation for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge). It contains TypeScript, Python, Go, and Rust Platform SDKs and a TypeScript React Query SDK add-on.
+This repository explores language SDK generation for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge). It contains TypeScript, Python, Go, Rust, and PHP Platform SDKs and a TypeScript React Query SDK add-on.
 
 ## Requirements
 
@@ -11,6 +11,7 @@ This repository explores language SDK generation for the YouVersion Platform API
 - Python: Python 3.11 or newer and uv. See the [Python setup and usage](packages/python/README.md).
 - Go: Go 1.24 or newer. See the [Go setup and usage](packages/go/README.md).
 - Rust: Rust 1.99.0 for the verified toolchain. See the [Rust setup and usage](packages/rust/README.md).
+- PHP: PHP 8.2 or newer and Composer. See the [PHP setup and usage](packages/php/README.md).
 
 ## Run locally
 
@@ -113,6 +114,10 @@ The Go module lives under `packages/go` and exports `client.NewPlatformClient`, 
 
 The unpublished crate lives under `packages/rust` and exports `PlatformClient`, `ApiClientBuilder`, typed models, and request options. Use a Cargo path dependency to consume it locally. See the [Rust README](packages/rust/README.md) for Tokio, HTTPS and transport configuration, approval redirects, cancellation, and manual pagination.
 
+## Use PHP
+
+The unpublished Composer package lives under `packages/php` and exports `Cameronapak\PlatformSdk\PlatformClient`, typed models, and native PSR approval responses. See the [PHP README](packages/php/README.md) for local artifact installation, Guzzle transport, timeout and retry overrides, approval redirects, and manual pagination. The [PHP specification](docs/php-sdk-spec.md) records the contract and generation boundary.
+
 ## Regenerate and verify
 
 Generation requires Node.js 22 or newer, pnpm, Git, and a running Docker daemon.
@@ -129,9 +134,12 @@ pnpm check:go
 pnpm generate:rust
 pnpm check:rust-generated
 pnpm check:rust
+pnpm generate:php
+pnpm check:php-generated
+pnpm check:php
 ```
 
-Go generation also requires Go; Rust generation requires Rust and rustfmt. In Amp orbs, `.agents/setup` installs Go, Rust, and locked dependencies. Start Docker for generation with `amp orb service start sdk-docker --command 'sudo dockerd --storage-driver=vfs --group user'`; stop it when finished with `amp orb service stop sdk-docker`.
+Go generation also requires Go; Rust generation requires Rust and rustfmt. PHP consumer checks require PHP, Composer, `ext-zip`, `unzip`, and OpenSSL. In Amp orbs, `.agents/setup` installs Go, Rust, PHP, Composer, and locked dependencies. Start Docker for generation with `amp orb service start sdk-docker --command 'sudo dockerd --storage-driver=vfs --group user'`; stop it when finished with `amp orb service stop sdk-docker`.
 
 The generator is pinned to a tested Forge commit and builds the standalone transformer from source. It applies compatibility adaptations after Forge runs:
 
@@ -139,6 +147,6 @@ The generator is pinned to a tested Forge commit and builds the standalone trans
 - Keep OAuth optional for app-key-only endpoints while using bearer authentication when `token` is supplied.
 - Generate the React Query add-on from the adapted SDK inventory and OpenAPI operation metadata.
 
-TypeScript generated source is tracked under `src/generated`, with its operation-to-method mapping at `src/generated/sdk-map.json`. Python generated source and its mapping are tracked under `packages/python/src/cameronapak_platform_sdk`; Go's are under `packages/go`; Rust's are under `packages/rust`. Root `fern/` pins Python, Go, and Rust generation; shared preparation uses a temporary copy of the authoritative OpenAPI document.
+TypeScript generated source is tracked under `src/generated`, with its operation-to-method mapping at `src/generated/sdk-map.json`. Python generated source and its mapping are tracked under `packages/python/src/cameronapak_platform_sdk`; Go's are under `packages/go`; Rust's are under `packages/rust`; PHP's are under `packages/php`. Root `fern/` pins Python, Go, Rust, and PHP generation; shared preparation uses a temporary copy of the authoritative OpenAPI document.
 
-All four language SDKs consume the [shared wire conformance cases](test/conformance/README.md), covering every OpenAPI operation with local HTTP requests. Python runs the cases on both client surfaces; Go checks a clean consumer module under the race detector; Rust checks an extracted crate artifact from a separate consumer. Language validation runs independently in CI; nothing publishes the packages or calls the live YouVersion Platform API.
+All five language SDKs consume the [shared wire conformance cases](test/conformance/README.md), covering every OpenAPI operation with local HTTP requests. Python runs the cases on both client surfaces; Go checks a clean consumer module under the race detector; Rust checks an extracted crate artifact from a separate consumer; PHP installs a local Composer archive into a separate consumer. Language validation runs independently in CI; nothing publishes the packages or calls the live YouVersion Platform API.

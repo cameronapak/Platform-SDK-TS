@@ -106,3 +106,31 @@ jobs:
         with:
           components: rustfmt
       - run: node scripts/generate-rust.mjs --check
+
+  php:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.2', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: curl, mbstring, zip
+          tools: composer:v2
+          coverage: none
+      - run: node packages/php/check.mjs
+
+  php-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/generate-php.mjs --check

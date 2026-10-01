@@ -1,0 +1,488 @@
+{
+  "data_exchange.approval_get": {
+    "accessor": "dataExchange",
+    "method": "approvalGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\DataExchange\\Requests\\DataExchangeApprovalGetRequest",
+    "parameters": {
+      "token": "token",
+      "x-yvp-app-key": "xYvpAppKey",
+      "x-yvp-app-id": "xYvpAppId"
+    },
+    "httpMethod": "GET",
+    "path": "/data-exchange"
+  },
+  "data_exchange.approval_post": {
+    "accessor": "dataExchange",
+    "method": "approvalPost",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\DataExchange\\Requests\\DataExchangeApprovalPostRequest",
+    "parameters": {
+      "token": "token",
+      "x-yvp-app-key": "xYvpAppKey",
+      "x-yvp-app-id": "xYvpAppId"
+    },
+    "httpMethod": "POST",
+    "path": "/data-exchange"
+  },
+  "data_exchange.token_post": {
+    "accessor": "dataExchange",
+    "method": "tokenPost",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\DataExchange\\Requests\\DataExchangeTokenPostRequest",
+    "parameters": {
+      "x-yvp-app-key": "xYvpAppKey",
+      "x-yvp-app-id": "xYvpAppId",
+      "requested_permissions": "requestedPermissions"
+    },
+    "httpMethod": "POST",
+    "path": "/data-exchange/token"
+  },
+  "bibles.collection_get": {
+    "accessor": "bibles",
+    "method": "collectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Bibles\\Requests\\BiblesCollectionGetRequest",
+    "parameters": {
+      "all_available": "allAvailable",
+      "language_ranges[]": "languageRangesArray",
+      "license_id": "licenseId",
+      "page_size": "pageSize",
+      "fields[]": "fieldsArray",
+      "page_token": "pageToken"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles"
+  },
+  "bibles.resource_get": {
+    "accessor": "bibles",
+    "method": "resourceGet",
+    "args": [
+      "bibleIdPath"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}"
+  },
+  "bibles_index.collection_get": {
+    "accessor": "bibles",
+    "method": "indexCollectionGet",
+    "args": [
+      "bibleIdPath"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/index"
+  },
+  "bibles_passages.resource_get": {
+    "accessor": "bibles",
+    "method": "passagesResourceGet",
+    "args": [
+      "bibleIdPath",
+      "passageIdPath",
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Bibles\\Requests\\BiblesPassagesResourceGetRequest",
+    "parameters": {
+      "format": "format",
+      "include_headings": "includeHeadings",
+      "include_notes": "includeNotes",
+      "passage_id_path": "passageIdPath",
+      "bible_id_path": "bibleIdPath"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/passages/{passage_id_path}"
+  },
+  "bibles_books.collection_get": {
+    "accessor": "bibles",
+    "method": "booksCollectionGet",
+    "args": [
+      "bibleIdPath",
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Bibles\\Requests\\BiblesBooksCollectionGetRequest",
+    "parameters": {
+      "canon": "canon",
+      "bible_id_path": "bibleIdPath"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books"
+  },
+  "bibles_books.resource_get": {
+    "accessor": "bibles",
+    "method": "booksResourceGet",
+    "args": [
+      "bibleIdPath",
+      "bookId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath",
+      "book_id": "bookId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}"
+  },
+  "bibles_books_chapters.collection_get": {
+    "accessor": "bibles",
+    "method": "booksChaptersCollectionGet",
+    "args": [
+      "bibleIdPath",
+      "bookId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath",
+      "book_id": "bookId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters"
+  },
+  "bibles_books_chapters.resource_get": {
+    "accessor": "bibles",
+    "method": "booksChaptersResourceGet",
+    "args": [
+      "bibleIdPath",
+      "bookId",
+      "chapterId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath",
+      "book_id": "bookId",
+      "chapter_id": "chapterId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters/{chapter_id}"
+  },
+  "bibles_books_chapters_verses.collection_get": {
+    "accessor": "bibles",
+    "method": "booksChaptersVersesCollectionGet",
+    "args": [
+      "bibleIdPath",
+      "bookId",
+      "chapterId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath",
+      "book_id": "bookId",
+      "chapter_id": "chapterId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters/{chapter_id}/verses"
+  },
+  "bibles_books_chapters_verses.resource_get": {
+    "accessor": "bibles",
+    "method": "booksChaptersVersesResourceGet",
+    "args": [
+      "bibleIdPath",
+      "bookId",
+      "chapterId",
+      "verseId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "bible_id_path": "bibleIdPath",
+      "book_id": "bookId",
+      "chapter_id": "chapterId",
+      "verse_id": "verseId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters/{chapter_id}/verses/{verse_id}"
+  },
+  "v1.highlights.collection_get": {
+    "accessor": "highlights",
+    "method": "v1HighlightsCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Highlights\\Requests\\V1HighlightsCollectionGetRequest",
+    "parameters": {
+      "bible_id": "bibleId",
+      "passage_id": "passageId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/highlights"
+  },
+  "v1.highlights.collection_post": {
+    "accessor": "highlights",
+    "method": "v1HighlightsCollectionPost",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Highlights\\Requests\\V1HighlightsCollectionPostRequest",
+    "parameters": {
+      "request_id": "requestId",
+      "highlight": "highlight"
+    },
+    "httpMethod": "POST",
+    "path": "/v1/highlights"
+  },
+  "v1.highlights.resource_delete": {
+    "accessor": "highlights",
+    "method": "v1HighlightsResourceDelete",
+    "args": [
+      "passageIdPath",
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Highlights\\Requests\\V1HighlightsResourceDeleteRequest",
+    "parameters": {
+      "bible_id": "bibleId",
+      "passage_id_path": "passageIdPath"
+    },
+    "httpMethod": "DELETE",
+    "path": "/v1/highlights/{passage_id_path}"
+  },
+  "v1.fonts.collection_get": {
+    "accessor": "fonts",
+    "method": "v1FontsCollectionGet",
+    "args": [],
+    "requestType": null,
+    "parameters": {},
+    "httpMethod": "GET",
+    "path": "/v1/fonts"
+  },
+  "v1.fonts.resource_get": {
+    "accessor": "fonts",
+    "method": "v1FontsResourceGet",
+    "args": [
+      "fontId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "font_id": "fontId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/fonts/{font_id}"
+  },
+  "v1.fonts.stylesheet_get": {
+    "accessor": "fonts",
+    "method": "v1FontsStylesheetGet",
+    "args": [
+      "fontId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "font_id": "fontId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/fonts/{font_id}/stylesheet"
+  },
+  "v1.search_queries.collection_get": {
+    "accessor": "searchQueries",
+    "method": "v1SearchQueriesCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\SearchQueries\\Requests\\V1SearchQueriesCollectionGetRequest",
+    "parameters": {
+      "language_ranges[]": "languageRangesArray",
+      "query": "query",
+      "trending": "trending"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/search-queries"
+  },
+  "v1.search_unified.collection_get": {
+    "accessor": "searchUnified",
+    "method": "v1SearchUnifiedCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\SearchUnified\\Requests\\V1SearchUnifiedCollectionGetRequest",
+    "parameters": {
+      "query": "query",
+      "bible_id": "bibleId",
+      "language_ranges[]": "languageRangesArray",
+      "user_intent": "userIntent",
+      "fields[]": "fieldsArray"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/search-unified"
+  },
+  "v1.search_topics.collection_get": {
+    "accessor": "searchTopics",
+    "method": "v1SearchTopicsCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\SearchTopics\\Requests\\V1SearchTopicsCollectionGetRequest",
+    "parameters": {
+      "query": "query",
+      "language_ranges[]": "languageRangesArray"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/search-topics"
+  },
+  "v1.search_verses.collection_get": {
+    "accessor": "searchVerses",
+    "method": "v1SearchVersesCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\SearchVerses\\Requests\\V1SearchVersesCollectionGetRequest",
+    "parameters": {
+      "query": "query",
+      "bible_id": "bibleId",
+      "user_intent": "userIntent",
+      "page_size": "pageSize",
+      "page_token": "pageToken"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/search-verses"
+  },
+  "v1.languages.collection_get": {
+    "accessor": "languages",
+    "method": "v1LanguagesCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Languages\\Requests\\V1LanguagesCollectionGetRequest",
+    "parameters": {
+      "page_size": "pageSize",
+      "fields[]": "fieldsArray",
+      "page_token": "pageToken",
+      "country": "country",
+      "bibles_available": "biblesAvailable"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/languages"
+  },
+  "v1.languages.resource_get": {
+    "accessor": "languages",
+    "method": "v1LanguagesResourceGet",
+    "args": [
+      "languageId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "language_id": "languageId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/languages/{language_id}"
+  },
+  "v1.licenses.collection_get": {
+    "accessor": "licenses",
+    "method": "v1LicensesCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Licenses\\Requests\\V1LicensesCollectionGetRequest",
+    "parameters": {
+      "bible_id": "bibleId",
+      "developer_id": "developerId",
+      "all_available": "allAvailable"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/licenses"
+  },
+  "v1.apps.resource_get": {
+    "accessor": "apps",
+    "method": "v1AppsResourceGet",
+    "args": [
+      "appId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "app_id": "appId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/apps/{app_id}"
+  },
+  "v1.apps.permissions.collection_get": {
+    "accessor": "permissions",
+    "method": "v1AppsPermissionsCollectionGet",
+    "args": [
+      "appId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "app_id": "appId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/apps/{app_id}/permissions"
+  },
+  "v1.organizations.collection_get": {
+    "accessor": "organizations",
+    "method": "v1OrganizationsCollectionGet",
+    "args": [
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Organizations\\Requests\\V1OrganizationsCollectionGetRequest",
+    "parameters": {
+      "bible_ids[]": "bibleIdsArray",
+      "page_size": "pageSize",
+      "fields[]": "fieldsArray",
+      "page_token": "pageToken"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/organizations"
+  },
+  "v1.organizations.resource_get": {
+    "accessor": "organizations",
+    "method": "v1OrganizationsResourceGet",
+    "args": [
+      "organizationId"
+    ],
+    "requestType": null,
+    "parameters": {
+      "organization_id": "organizationId"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/organizations/{organization_id}"
+  },
+  "v1.organizations.bibles.collection_get": {
+    "accessor": "organizations",
+    "method": "v1OrganizationsBiblesCollectionGet",
+    "args": [
+      "organizationId",
+      "request"
+    ],
+    "requestType": "Cameronapak\\PlatformSdk\\Organizations\\Requests\\V1OrganizationsBiblesCollectionGetRequest",
+    "parameters": {
+      "organization_id": "organizationId",
+      "page_size": "pageSize",
+      "fields[]": "fieldsArray",
+      "page_token": "pageToken"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/organizations/{organization_id}/bibles"
+  },
+  "v1.verse_of_the_days.canonical.collection_get": {
+    "accessor": "verseOfTheDays",
+    "method": "v1VerseOfTheDaysCanonicalCollectionGet",
+    "args": [],
+    "requestType": null,
+    "parameters": {},
+    "httpMethod": "GET",
+    "path": "/v1/verse-of-the-days"
+  },
+  "v1.verse_of_the_days.canonical.resource_get": {
+    "accessor": "verseOfTheDays",
+    "method": "v1VerseOfTheDaysCanonicalResourceGet",
+    "args": [
+      "day"
+    ],
+    "requestType": null,
+    "parameters": {
+      "day": "day"
+    },
+    "httpMethod": "GET",
+    "path": "/v1/verse-of-the-days/{day}"
+  }
+}
