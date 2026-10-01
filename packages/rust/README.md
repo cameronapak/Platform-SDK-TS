@@ -95,6 +95,12 @@ pnpm check:rust
 
 Generation requires Node.js 22+, Rust with rustfmt, and a running Docker daemon. Checks also require Clippy, OpenSSL, and tar. Root `fern/` retains Forge's Fern CLI `5.112.0` and Rust generator `0.42.1`. HTTPS uses the generator's supported `extraDependencies` setting; contract gaps use counted adaptations in `adapt.mjs`. The authoritative OpenAPI stays unchanged.
 
+Three adaptations address failures in the pinned generator and runtime:
+
+- Search: Fern's `structured_query` helper can turn literal text such as `John3:16` into unrelated query parameters. Search operations use a literal string instead.
+- Responses: the default parser rejects successful empty required text and tries to parse undeclared response bodies as JSON. The adaptation preserves empty text and discards bodies for unit responses, including approval redirects, without losing status or headers.
+- Paths: URL parsing can normalize whole-segment `.` and `..` into a different request path. The adaptation encodes each string identifier as one segment and rejects dot segments before sending.
+
 Generation validates each operation's method, path, and parameters before producing `sdk-map.json` and consumer dispatch. Dependency locks are checked in and reused during regeneration. Checks package the crate, extract it into a temporary directory, resolve it from a separate consumer, run all shared wire cases, and exercise TLS, redirects, authentication, retries, cancellation, timeouts, and typed builders. Consumer examples compile as documentation tests; generated Fern utility doctests remain disabled by its default. Tests use loopback HTTP/HTTPS and synthetic credentials, never the live YouVersion Platform API.
 
 Clippy checks the library and all consumer targets. Lint and documentation warnings from generated code remain visible. Full-crate Clippy fails on Fern's numeric utility test fixtures (`approx_constant`); those fixtures remain unchanged and run under `cargo test` instead.
