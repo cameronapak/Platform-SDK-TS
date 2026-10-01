@@ -3,13 +3,14 @@
 > [!IMPORTANT]
 > This is Cameron Pak's personal project exploring Cloudflare Forge. Cameron contracts for YouVersion, but this project is not a YouVersion project or an official or supported YouVersion SDK. It is not published as a package, and its API may change without notice.
 
-This repository explores language SDK generation for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge). It contains TypeScript, Python, and Go Platform SDKs and a TypeScript React Query SDK add-on.
+This repository explores language SDK generation for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge). It contains TypeScript, Python, Go, and Rust Platform SDKs and a TypeScript React Query SDK add-on.
 
 ## Requirements
 
 - TypeScript: Node.js 22 or newer and pnpm.
 - Python: Python 3.11 or newer and uv. See the [Python setup and usage](packages/python/README.md).
 - Go: Go 1.24 or newer. See the [Go setup and usage](packages/go/README.md).
+- Rust: Rust 1.99.0 for the verified toolchain. See the [Rust setup and usage](packages/rust/README.md).
 
 ## Run locally
 
@@ -108,6 +109,10 @@ See the [Python README](packages/python/README.md) for installation, sync and as
 
 The Go module lives under `packages/go` and exports `client.NewPlatformClient`, typed request and response models, and request options. Use a local `go.mod` replacement to consume it without a versioned release. See the [Go README](packages/go/README.md) for setup, context cancellation, transport configuration, approval redirects, and manual pagination.
 
+## Use Rust
+
+The unpublished crate lives under `packages/rust` and exports `PlatformClient`, `ApiClientBuilder`, typed models, and request options. Use a Cargo path dependency to consume it locally. See the [Rust README](packages/rust/README.md) for Tokio, HTTPS and transport configuration, approval redirects, cancellation, and manual pagination.
+
 ## Regenerate and verify
 
 Generation requires Node.js 22 or newer, pnpm, Git, and a running Docker daemon.
@@ -121,9 +126,12 @@ pnpm check:python
 pnpm generate:go
 pnpm check:go-generated
 pnpm check:go
+pnpm generate:rust
+pnpm check:rust-generated
+pnpm check:rust
 ```
 
-Go generation also requires Go. In Amp orbs, `.agents/setup` installs Go and locked dependencies. Start Docker for generation with `amp orb service start sdk-docker --command 'sudo dockerd --storage-driver=vfs --group user'`; stop it when finished with `amp orb service stop sdk-docker`.
+Go generation also requires Go; Rust generation requires Rust and rustfmt. In Amp orbs, `.agents/setup` installs Go, Rust, and locked dependencies. Start Docker for generation with `amp orb service start sdk-docker --command 'sudo dockerd --storage-driver=vfs --group user'`; stop it when finished with `amp orb service stop sdk-docker`.
 
 The generator is pinned to a tested Forge commit and builds the standalone transformer from source. It applies compatibility adaptations after Forge runs:
 
@@ -131,6 +139,6 @@ The generator is pinned to a tested Forge commit and builds the standalone trans
 - Keep OAuth optional for app-key-only endpoints while using bearer authentication when `token` is supplied.
 - Generate the React Query add-on from the adapted SDK inventory and OpenAPI operation metadata.
 
-TypeScript generated source is tracked under `src/generated`, with its operation-to-method mapping at `src/generated/sdk-map.json`. Python generated source and its mapping are tracked under `packages/python/src/cameronapak_platform_sdk`; Go's are under `packages/go`. Root `fern/` pins Python and Go generation; shared preparation uses a temporary copy of the authoritative OpenAPI document.
+TypeScript generated source is tracked under `src/generated`, with its operation-to-method mapping at `src/generated/sdk-map.json`. Python generated source and its mapping are tracked under `packages/python/src/cameronapak_platform_sdk`; Go's are under `packages/go`; Rust's are under `packages/rust`. Root `fern/` pins Python, Go, and Rust generation; shared preparation uses a temporary copy of the authoritative OpenAPI document.
 
-All three language SDKs consume the [shared wire conformance cases](test/conformance/README.md), covering every OpenAPI operation with local HTTP requests. Python runs the cases on both client surfaces; Go checks a clean consumer module under the race detector. Language validation runs independently in CI; nothing publishes the packages or calls the live YouVersion Platform API.
+All four language SDKs consume the [shared wire conformance cases](test/conformance/README.md), covering every OpenAPI operation with local HTTP requests. Python runs the cases on both client surfaces; Go checks a clean consumer module under the race detector; Rust checks an extracted crate artifact from a separate consumer. Language validation runs independently in CI; nothing publishes the packages or calls the live YouVersion Platform API.

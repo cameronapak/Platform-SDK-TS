@@ -1,0 +1,13 @@
+[package]
+name = "platform-sdk-rust-consumer"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+cameronapak_platform_sdk = { path = "../.." }
+reqwest = { version = "0.12", default-features = false }
+serde_json = "1"
+tokio = { version = "1", features = ["full", "test-util"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
+rustls-pemfile = "2"

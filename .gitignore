@@ -7,3 +7,5 @@ dist/
 __pycache__/
 *.pyc
 .mypy_cache/
+packages/rust/target/
+packages/rust/test/consumer/target/
