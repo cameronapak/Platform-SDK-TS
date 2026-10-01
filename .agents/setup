@@ -3,6 +3,12 @@ set -euo pipefail
 
 # The orb already supplies Node, pnpm, uv, and Docker. Persist the missing
 # toolchains so generation and consumer checks also work in fresh orbs.
+if ! command -v composer >/dev/null || ! command -v unzip >/dev/null || ! php -r 'exit(extension_loaded("curl") && extension_loaded("mbstring") && extension_loaded("zip") ? 0 : 1);' 2>/dev/null; then
+  sudo apt-get update -qq
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq php-cli php-curl php-mbstring php-xml php-zip composer unzip
+fi
+php --version | head -n 1
+composer --version
 version=go1.27.1
 if ! command -v go >/dev/null || [[ "$(go version)" != "go version $version linux/amd64" ]]; then
   archive=$(mktemp)

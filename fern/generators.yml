@@ -1,4 +1,4 @@
-# Python, Go, and Rust pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
+# Python, Go, Rust, and PHP pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
 # TypeScript retains its existing Forge transformer in scripts/generate.mjs.
 api:
   specs:
@@ -57,3 +57,20 @@ groups:
               features: [json, stream, gzip, rustls-tls]
               default-features: false
             percent-encoding: '2'
+  php-sdk:
+    generators:
+      - name: fernapi/fern-php-sdk
+        version: 2.11.1
+        output:
+          location: local-file-system
+          path: ../.cache/php-generated
+        config:
+          namespace: Cameronapak\PlatformSdk
+          packageName: cameronapak/platform-sdk
+          clientName: PlatformClient
+          composerJson:
+            description: Experimental unofficial SDK for the YouVersion Platform API
+            license: Apache-2.0
+            version: 0.1.0
+            require:
+              php: '^8.2'

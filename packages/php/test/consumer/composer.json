@@ -1,0 +1,20 @@
+{
+  "name": "cameronapak/platform-sdk-consumer",
+  "description": "Installed artifact conformance consumer for the experimental Platform SDK",
+  "license": "Apache-2.0",
+  "require": {
+    "php": "^8.2",
+    "cameronapak/platform-sdk": "0.1.0",
+    "guzzlehttp/guzzle": "^7.15.2"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.2"
+  },
+  "repositories": [
+    { "type": "artifact", "url": "artifacts" }
+  ],
+  "config": {
+    "allow-plugins": false,
+    "platform": { "php": "8.2.0" }
+  }
+}
