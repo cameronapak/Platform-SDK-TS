@@ -1,4 +1,4 @@
-# Python and Go pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
+# Python, Go, and Rust pins match Cloudflare Forge commit 00b8ede867530f8891fe4124b2f5f20ee8d0b05e.
 # TypeScript retains its existing Forge transformer in scripts/generate.mjs.
 api:
   specs:
@@ -37,3 +37,23 @@ groups:
           packageName: platform
           clientName: PlatformClient
           clientConstructorName: NewPlatformClient
+  rust-sdk:
+    generators:
+      - name: fernapi/fern-rust-sdk
+        version: 0.42.1
+        output:
+          location: local-file-system
+          path: ../.cache/rust-generated
+        config:
+          clientClassName: PlatformClient
+          crateName: cameronapak-platform-sdk
+          crateVersion: '0.1.0'
+          packageDescription: Experimental unofficial SDK for the YouVersion Platform API
+          packageLicense: Apache-2.0
+          packageRepository: https://github.com/cameronapak/Unofficial-YouVersion-Platform-SDKs
+          extraDependencies:
+            reqwest:
+              version: '0.12'
+              features: [json, stream, gzip, rustls-tls]
+              default-features: false
+            percent-encoding: '2'

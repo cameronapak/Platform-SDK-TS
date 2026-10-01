@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# The orb already supplies Node, pnpm, uv, and Docker. Persist the missing Go
-# toolchain so generation and consumer checks also work in fresh orbs.
+# The orb already supplies Node, pnpm, uv, and Docker. Persist the missing
+# toolchains so generation and consumer checks also work in fresh orbs.
 version=go1.27.1
 if ! command -v go >/dev/null || [[ "$(go version)" != "go version $version linux/amd64" ]]; then
   archive=$(mktemp)
@@ -15,6 +15,18 @@ if ! command -v go >/dev/null || [[ "$(go version)" != "go version $version linu
   sudo ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
 fi
 go version
+if ! command -v rustup >/dev/null; then
+  curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.99.0
+fi
+source "$HOME/.cargo/env"
+rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
+rustup default 1.99.0
+for tool in cargo rustc rustfmt; do
+  sudo ln -sf "$HOME/.cargo/bin/$tool" "/usr/local/bin/$tool"
+done
+rustc --version
 pnpm install --frozen-lockfile
 go -C packages/go mod download
 uv sync --project packages/python --frozen --no-install-project
+cargo fetch --locked --manifest-path packages/rust/Cargo.toml
+cargo fetch --locked --manifest-path packages/rust/test/consumer/Cargo.toml

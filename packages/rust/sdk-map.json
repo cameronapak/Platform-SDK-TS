@@ -1,0 +1,379 @@
+{
+  "data_exchange.approval_get": {
+    "accessor": "data_exchange",
+    "method": "approval_get",
+    "requestType": "ApprovalGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/data-exchange",
+    "parameters": {
+      "token": "token",
+      "x-yvp-app-key": "x_yvp_app_key",
+      "x-yvp-app-id": "x_yvp_app_id"
+    }
+  },
+  "data_exchange.approval_post": {
+    "accessor": "data_exchange",
+    "method": "approval_post",
+    "requestType": "ApprovalPostQueryRequest",
+    "httpMethod": "POST",
+    "path": "/data-exchange",
+    "parameters": {
+      "token": "token",
+      "x-yvp-app-key": "x_yvp_app_key",
+      "x-yvp-app-id": "x_yvp_app_id"
+    }
+  },
+  "data_exchange.token_post": {
+    "accessor": "data_exchange",
+    "method": "token_post",
+    "requestType": "DataExchangeTokenPostRequest",
+    "httpMethod": "POST",
+    "path": "/data-exchange/token",
+    "parameters": {
+      "x-yvp-app-key": "x_yvp_app_key",
+      "x-yvp-app-id": "x_yvp_app_id",
+      "requested_permissions": "requested_permissions"
+    }
+  },
+  "bibles.collection_get": {
+    "accessor": "bibles",
+    "method": "collection_get",
+    "requestType": "CollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/bibles",
+    "parameters": {
+      "all_available": "all_available",
+      "language_ranges[]": "language_ranges_array",
+      "license_id": "license_id",
+      "page_size": "page_size",
+      "fields[]": "fields_array",
+      "page_token": "page_token"
+    }
+  },
+  "bibles.resource_get": {
+    "accessor": "bibles",
+    "method": "resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}",
+    "parameters": {
+      "bible_id_path": "bible_id_path"
+    }
+  },
+  "bibles_index.collection_get": {
+    "accessor": "bibles",
+    "method": "index_collection_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/index",
+    "parameters": {
+      "bible_id_path": "bible_id_path"
+    }
+  },
+  "bibles_passages.resource_get": {
+    "accessor": "bibles",
+    "method": "passages_resource_get",
+    "requestType": "PassagesResourceGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/passages/{passage_id_path}",
+    "parameters": {
+      "format": "format",
+      "include_headings": "include_headings",
+      "include_notes": "include_notes",
+      "passage_id_path": "passage_id_path",
+      "bible_id_path": "bible_id_path"
+    }
+  },
+  "bibles_books.collection_get": {
+    "accessor": "bibles",
+    "method": "books_collection_get",
+    "requestType": "BooksCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books",
+    "parameters": {
+      "canon": "canon",
+      "bible_id_path": "bible_id_path"
+    }
+  },
+  "bibles_books.resource_get": {
+    "accessor": "bibles",
+    "method": "books_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}",
+    "parameters": {
+      "bible_id_path": "bible_id_path",
+      "book_id": "book_id"
+    }
+  },
+  "bibles_books_chapters.collection_get": {
+    "accessor": "bibles",
+    "method": "books_chapters_collection_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters",
+    "parameters": {
+      "bible_id_path": "bible_id_path",
+      "book_id": "book_id"
+    }
+  },
+  "bibles_books_chapters.resource_get": {
+    "accessor": "bibles",
+    "method": "books_chapters_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters/{chapter_id}",
+    "parameters": {
+      "bible_id_path": "bible_id_path",
+      "book_id": "book_id",
+      "chapter_id": "chapter_id"
+    }
+  },
+  "bibles_books_chapters_verses.collection_get": {
+    "accessor": "bibles",
+    "method": "books_chapters_verses_collection_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters/{chapter_id}/verses",
+    "parameters": {
+      "bible_id_path": "bible_id_path",
+      "book_id": "book_id",
+      "chapter_id": "chapter_id"
+    }
+  },
+  "bibles_books_chapters_verses.resource_get": {
+    "accessor": "bibles",
+    "method": "books_chapters_verses_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/bibles/{bible_id_path}/books/{book_id}/chapters/{chapter_id}/verses/{verse_id}",
+    "parameters": {
+      "bible_id_path": "bible_id_path",
+      "book_id": "book_id",
+      "chapter_id": "chapter_id",
+      "verse_id": "verse_id"
+    }
+  },
+  "v1.highlights.collection_get": {
+    "accessor": "highlights",
+    "method": "v1highlights_collection_get",
+    "requestType": "V1HighlightsCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/highlights",
+    "parameters": {
+      "bible_id": "bible_id",
+      "passage_id": "passage_id"
+    }
+  },
+  "v1.highlights.collection_post": {
+    "accessor": "highlights",
+    "method": "v1highlights_collection_post",
+    "requestType": "V1HighlightsCollectionPostRequest",
+    "httpMethod": "POST",
+    "path": "/v1/highlights",
+    "parameters": {
+      "request_id": "request_id",
+      "highlight": "highlight"
+    }
+  },
+  "v1.highlights.resource_delete": {
+    "accessor": "highlights",
+    "method": "v1highlights_resource_delete",
+    "requestType": "V1HighlightsResourceDeleteQueryRequest",
+    "httpMethod": "DELETE",
+    "path": "/v1/highlights/{passage_id_path}",
+    "parameters": {
+      "bible_id": "bible_id",
+      "passage_id_path": "passage_id_path"
+    }
+  },
+  "v1.fonts.collection_get": {
+    "accessor": "fonts",
+    "method": "v1fonts_collection_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/fonts",
+    "parameters": {}
+  },
+  "v1.fonts.resource_get": {
+    "accessor": "fonts",
+    "method": "v1fonts_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/fonts/{font_id}",
+    "parameters": {
+      "font_id": "font_id"
+    }
+  },
+  "v1.fonts.stylesheet_get": {
+    "accessor": "fonts",
+    "method": "v1fonts_stylesheet_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/fonts/{font_id}/stylesheet",
+    "parameters": {
+      "font_id": "font_id"
+    }
+  },
+  "v1.search_queries.collection_get": {
+    "accessor": "search_queries",
+    "method": "v1search_queries_collection_get",
+    "requestType": "V1SearchQueriesCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/search-queries",
+    "parameters": {
+      "language_ranges[]": "language_ranges_array",
+      "query": "query",
+      "trending": "trending"
+    }
+  },
+  "v1.search_unified.collection_get": {
+    "accessor": "search_unified",
+    "method": "v1search_unified_collection_get",
+    "requestType": "V1SearchUnifiedCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/search-unified",
+    "parameters": {
+      "query": "query",
+      "bible_id": "bible_id",
+      "language_ranges[]": "language_ranges_array",
+      "user_intent": "user_intent",
+      "fields[]": "fields_array"
+    }
+  },
+  "v1.search_topics.collection_get": {
+    "accessor": "search_topics",
+    "method": "v1search_topics_collection_get",
+    "requestType": "V1SearchTopicsCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/search-topics",
+    "parameters": {
+      "query": "query",
+      "language_ranges[]": "language_ranges_array"
+    }
+  },
+  "v1.search_verses.collection_get": {
+    "accessor": "search_verses",
+    "method": "v1search_verses_collection_get",
+    "requestType": "V1SearchVersesCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/search-verses",
+    "parameters": {
+      "query": "query",
+      "bible_id": "bible_id",
+      "user_intent": "user_intent",
+      "page_size": "page_size",
+      "page_token": "page_token"
+    }
+  },
+  "v1.languages.collection_get": {
+    "accessor": "languages",
+    "method": "v1languages_collection_get",
+    "requestType": "V1LanguagesCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/languages",
+    "parameters": {
+      "page_size": "page_size",
+      "fields[]": "fields_array",
+      "page_token": "page_token",
+      "country": "country",
+      "bibles_available": "bibles_available"
+    }
+  },
+  "v1.languages.resource_get": {
+    "accessor": "languages",
+    "method": "v1languages_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/languages/{language_id}",
+    "parameters": {
+      "language_id": "language_id"
+    }
+  },
+  "v1.licenses.collection_get": {
+    "accessor": "licenses",
+    "method": "v1licenses_collection_get",
+    "requestType": "V1LicensesCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/licenses",
+    "parameters": {
+      "bible_id": "bible_id",
+      "developer_id": "developer_id",
+      "all_available": "all_available"
+    }
+  },
+  "v1.apps.resource_get": {
+    "accessor": "apps",
+    "method": "v1apps_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/apps/{app_id}",
+    "parameters": {
+      "app_id": "app_id"
+    }
+  },
+  "v1.apps.permissions.collection_get": {
+    "accessor": "permissions",
+    "method": "v1apps_permissions_collection_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/apps/{app_id}/permissions",
+    "parameters": {
+      "app_id": "app_id"
+    }
+  },
+  "v1.organizations.collection_get": {
+    "accessor": "organizations",
+    "method": "v1organizations_collection_get",
+    "requestType": "V1OrganizationsCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/organizations",
+    "parameters": {
+      "bible_ids[]": "bible_ids_array",
+      "page_size": "page_size",
+      "fields[]": "fields_array",
+      "page_token": "page_token"
+    }
+  },
+  "v1.organizations.resource_get": {
+    "accessor": "organizations",
+    "method": "v1organizations_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/organizations/{organization_id}",
+    "parameters": {
+      "organization_id": "organization_id"
+    }
+  },
+  "v1.organizations.bibles.collection_get": {
+    "accessor": "organizations",
+    "method": "v1organizations_bibles_collection_get",
+    "requestType": "V1OrganizationsBiblesCollectionGetQueryRequest",
+    "httpMethod": "GET",
+    "path": "/v1/organizations/{organization_id}/bibles",
+    "parameters": {
+      "organization_id": "organization_id",
+      "page_size": "page_size",
+      "fields[]": "fields_array",
+      "page_token": "page_token"
+    }
+  },
+  "v1.verse_of_the_days.canonical.collection_get": {
+    "accessor": "verse_of_the_days",
+    "method": "v1verse_of_the_days_canonical_collection_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/verse-of-the-days",
+    "parameters": {}
+  },
+  "v1.verse_of_the_days.canonical.resource_get": {
+    "accessor": "verse_of_the_days",
+    "method": "v1verse_of_the_days_canonical_resource_get",
+    "requestType": null,
+    "httpMethod": "GET",
+    "path": "/v1/verse-of-the-days/{day}",
+    "parameters": {
+      "day": "day"
+    }
+  }
+}

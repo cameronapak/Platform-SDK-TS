@@ -82,3 +82,27 @@ jobs:
           go-version: '1.24.x'
           cache-dependency-path: packages/go/go.sum
       - run: node scripts/generate-go.mjs --check
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.99.0
+        with:
+          components: rustfmt, clippy
+      - run: node packages/rust/check.mjs
+
+  rust-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.99.0
+        with:
+          components: rustfmt
+      - run: node scripts/generate-rust.mjs --check
