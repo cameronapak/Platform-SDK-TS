@@ -56,6 +56,48 @@ test('installed npm artifact conforms to shared wire cases', async (t) => {
   const installedMap = JSON.parse(await readFile(join(packageRoot, 'dist', 'generated', 'sdk-map.json'), 'utf8'));
   assert.deepEqual(installedMap, sourceSdkMap);
 
+  await t.test('malformed successful JSON rejects with actual response metadata', async () => {
+    const client = new sdk.YouVersionPlatformClient({
+      yvpAppKey: 'fake-app-key',
+      maxRetries: 0,
+      fetch: async () => new Response('not-json', {
+        status: 200,
+        headers: { 'content-type': 'application/json', 'x-request-id': 'parse-failure-17' },
+      }),
+    });
+    await assert.rejects(client.bibles.resourceGet({ bible_id_path: 111 }), (error) => {
+      assert.ok(error instanceof sdk.YouVersionPlatformError);
+      assert.equal(error.statusCode, 200);
+      assert.equal(error.rawResponse.status, 200);
+      assert.equal(error.requestId, 'parse-failure-17');
+      assert.equal(error.body, 'not-json');
+      return true;
+    });
+  });
+
+  await t.test('parse failures do not confuse payloads, text, redirects, or HTTP errors', async () => {
+    const makeClient = (response) => new sdk.YouVersionPlatformClient({
+      yvpAppKey: 'fake-app-key', maxRetries: 0, fetch: async () => response,
+    });
+    const payload = { ok: false, error: { reason: 'non-json', rawBody: 'ordinary data' } };
+    assert.deepEqual(await makeClient(Response.json(payload)).apps.v1AppsResourceGet({ app_id: 'app-id' }), payload);
+    assert.equal(await makeClient(new Response('body { not JSON }')).fonts.v1FontsStylesheetGet({ font_id: 17 }), 'body { not JSON }');
+    const redirect = await makeClient(new Response('<html>redirecting</html>', {
+      status: 303, headers: { location: 'http://127.0.0.1/callback?data_exchange_status=error' },
+    })).dataExchange.approvalPost({ token: 'fake-exchange-token' }).withRawResponse();
+    assert.equal(redirect.data, undefined);
+    assert.equal(redirect.rawResponse.status, 303);
+    assert.equal(redirect.rawResponse.headers.get('location'), 'http://127.0.0.1/callback?data_exchange_status=error');
+    const headerless = new Response('plain error', { status: 401 });
+    headerless.headers.delete('content-type');
+    await assert.rejects(makeClient(headerless).bibles.resourceGet({ bible_id_path: 111 }), (error) => {
+      assert.equal(error.statusCode, 401);
+      assert.equal(error.rawResponse.status, 401);
+      assert.equal(error.body, 'plain error');
+      return true;
+    });
+  });
+
   for (const item of cases) {
     await t.test(item.name, async () => {
       const calls = [];

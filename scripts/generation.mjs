@@ -30,3 +30,57 @@ export function replaceExactly(source, search, replacement, expected, file) {
   }
   return source.replaceAll(search, replacement);
 }
+
+// Keep parse failures in Fern's native error channel, not in API response data.
+export function adaptResponseParsing(source, file) {
+  const replace = (search, replacement) => {
+    source = replaceExactly(source, search, replacement, 1, file);
+  };
+  if (file.endsWith('/getResponseBody.ts')) {
+    replace("import { getBinaryResponse } from './BinaryResponse.js';", `import { getBinaryResponse } from './BinaryResponse.js';
+
+export class NonJsonResponseError extends Error {
+  constructor(public readonly statusCode: number, public readonly rawBody: string) {
+    super('Response body is not JSON');
+  }
+}`);
+    replace(`      return {
+        ok: false,
+        error: {
+          reason: 'non-json',
+          statusCode: response.status,
+          rawBody: text,
+        },
+      };`, '      throw new NonJsonResponseError(response.status, text);');
+  } else if (file.endsWith('/Fetcher.ts')) {
+    replace('import { getResponseBody } from "./getResponseBody.js";',
+      'import { getResponseBody, NonJsonResponseError } from "./getResponseBody.js";');
+    replace('            const body = await getResponseBody(response, args.responseType);', `            let body: unknown;
+            try {
+                if (response.status >= 300 && args.redirect === "manual" && args.responseType == null) {
+                    await response.text();
+                } else {
+                    body = await getResponseBody(response, args.responseType);
+                }
+            } catch (error) {
+                if (!(error instanceof NonJsonResponseError)) throw error;
+                return {
+                    ok: false,
+                    error: { reason: "non-json", statusCode: error.statusCode, rawBody: error.rawBody },
+                    rawResponse: toRawResponse(response),
+                };
+            }`);
+  } else if (file.endsWith('/getErrorResponseBody.ts')) {
+    replace('import { getResponseBody } from "./getResponseBody.js";',
+      'import { getResponseBody, NonJsonResponseError } from "./getResponseBody.js";');
+    replace('        return getResponseBody(response);', `        try {
+            return await getResponseBody(response);
+        } catch (error) {
+            if (!(error instanceof NonJsonResponseError)) throw error;
+            return error.rawBody;
+        }`);
+    source = replaceExactly(source, 'return text.length > 0 ? fromJson(text) : undefined;',
+      'try { return text.length > 0 ? fromJson(text) : undefined; } catch { return text; }', 2, file);
+  }
+  return source;
+}

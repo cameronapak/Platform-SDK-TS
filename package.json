@@ -24,6 +24,9 @@
   "scripts": {
     "generate": "node scripts/generate.mjs",
     "generate:react-query": "node scripts/generate-react-query.mjs",
+    "generate:cli": "node scripts/generate-cli.mjs",
+    "check:cli-generated": "node scripts/generate-cli.mjs --check",
+    "check:cli": "pnpm check:cli-generated && pnpm build && pnpm --dir packages/cli build && pnpm --dir packages/cli typecheck && node --test packages/cli/test/*.test.mjs && pnpm --dir packages/cli pack --dry-run",
     "generate:python": "node scripts/generate-python.mjs",
     "check:python-generated": "node scripts/generate-python.mjs --check",
     "check:python": "uv sync --project packages/python --frozen --no-install-project && uv run --project packages/python --no-sync python packages/python/check.py",
@@ -37,11 +40,11 @@
     "check:php-generated": "node scripts/generate-php.mjs --check",
     "check:php": "node packages/php/check.mjs",
     "build": "rm -rf dist && tsc -p tsconfig.json && cp src/generated/sdk-map.json dist/generated/sdk-map.json",
-    "build:all": "pnpm build && pnpm --dir packages/react-query build",
+    "build:all": "pnpm build && pnpm --dir packages/react-query build && pnpm --dir packages/cli build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
-    "test": "pnpm build:all && node --test test/*.test.mjs packages/react-query/test/*.test.mjs",
-    "check": "pnpm generate:react-query --check && pnpm build:all && pnpm typecheck && pnpm typecheck:test && pnpm --dir packages/react-query typecheck && pnpm --dir packages/react-query typecheck:test && node --test test/*.test.mjs packages/react-query/test/*.test.mjs && pnpm pack --dry-run && pnpm --dir packages/react-query pack --dry-run",
+    "test": "pnpm build:all && node --test test/*.test.mjs packages/react-query/test/*.test.mjs packages/cli/test/*.test.mjs",
+    "check": "pnpm generate:react-query --check && pnpm check:cli-generated && pnpm build:all && pnpm typecheck && pnpm typecheck:test && pnpm --dir packages/react-query typecheck && pnpm --dir packages/react-query typecheck:test && pnpm --dir packages/cli typecheck && node --test test/*.test.mjs packages/react-query/test/*.test.mjs packages/cli/test/*.test.mjs && pnpm pack --dry-run && pnpm --dir packages/react-query pack --dry-run && pnpm --dir packages/cli pack --dry-run",
     "prepack": "pnpm build"
   },
   "engines": {

@@ -1,6 +1,6 @@
 # YouVersion Platform SDK
 
-This context covers language SDKs and add-ons that expose the YouVersion Platform API. This repository is an unofficial experiment, not an official or supported YouVersion SDK.
+This context covers language SDKs, add-ons, and a terminal client that expose the YouVersion Platform API. This repository is an unofficial experiment, not an official or supported YouVersion SDK.
 
 ## Language
 
@@ -15,6 +15,10 @@ _Avoid_: Official SDK, API wrapper
 **SDK add-on**:
 A library layered over a Platform SDK to integrate it with another developer ecosystem without replacing the SDK.
 _Avoid_: SDK plugin, SDK extension
+
+**Platform CLI**:
+A terminal client through which developers explore and call the YouVersion Platform API.
+_Avoid_: Official CLI, SDK command runner
 
 **App key**:
 A client credential that identifies an app and tracks its Platform API usage. It does not represent a user.

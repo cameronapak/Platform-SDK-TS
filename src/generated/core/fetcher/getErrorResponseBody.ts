@@ -1,10 +1,15 @@
 import { fromJson } from "../json.js";
-import { getResponseBody } from "./getResponseBody.js";
+import { getResponseBody, NonJsonResponseError } from "./getResponseBody.js";
 
 export async function getErrorResponseBody(response: Response): Promise<unknown> {
     let contentType = response.headers.get("Content-Type")?.toLowerCase();
     if (contentType == null || contentType.length === 0) {
-        return getResponseBody(response);
+        try {
+            return await getResponseBody(response);
+        } catch (error) {
+            if (!(error instanceof NonJsonResponseError)) throw error;
+            return error.rawBody;
+        }
     }
 
     if (contentType.indexOf(";") !== -1) {
@@ -18,12 +23,12 @@ export async function getErrorResponseBody(response: Response): Promise<unknown>
         case "application/vnd.api+json":
         case "text/json": {
             const text = await response.text();
-            return text.length > 0 ? fromJson(text) : undefined;
+            try { return text.length > 0 ? fromJson(text) : undefined; } catch { return text; }
         }
         default:
             if (contentType.startsWith("application/vnd.") && contentType.endsWith("+json")) {
                 const text = await response.text();
-                return text.length > 0 ? fromJson(text) : undefined;
+                try { return text.length > 0 ? fromJson(text) : undefined; } catch { return text; }
             }
 
             // Fallback to plain text if content type is not recognized
