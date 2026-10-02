@@ -1,6 +1,12 @@
 import { fromJson } from '../json.js';
 import { getBinaryResponse } from './BinaryResponse.js';
 
+export class NonJsonResponseError extends Error {
+  constructor(public readonly statusCode: number, public readonly rawBody: string) {
+    super('Response body is not JSON');
+  }
+}
+
 // Pins the upstream Response so undici's FinalizationRegistry can't GC it and cancel the body stream.
 function retainResponse(target: object, response: Response): void {
   Object.defineProperty(target, '__fern_response_ref', {
@@ -53,14 +59,7 @@ export async function getResponseBody(response: Response, responseType?: string)
     try {
       responseBody = fromJson(text);
     } catch {
-      return {
-        ok: false,
-        error: {
-          reason: 'non-json',
-          statusCode: response.status,
-          rawBody: text,
-        },
-      };
+      throw new NonJsonResponseError(response.status, text);
     }
     return responseBody;
   }

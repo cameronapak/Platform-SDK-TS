@@ -7,7 +7,7 @@ import { EndpointSupplier } from "./EndpointSupplier.js";
 import { getErrorResponseBody } from "./getErrorResponseBody.js";
 import { getFetchFn } from "./getFetchFn.js";
 import { getRequestBody } from "./getRequestBody.js";
-import { getResponseBody } from "./getResponseBody.js";
+import { getResponseBody, NonJsonResponseError } from "./getResponseBody.js";
 import { Headers } from "./Headers.js";
 import { makeRequest } from "./makeRequest.js";
 import { abortRawResponse, toRawResponse, unknownRawResponse } from "./RawResponse.js";
@@ -312,7 +312,21 @@ export async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIR
                 };
                 logger.debug("HTTP request succeeded", metadata);
             }
-            const body = await getResponseBody(response, args.responseType);
+            let body: unknown;
+            try {
+                if (response.status >= 300 && args.redirect === "manual" && args.responseType == null) {
+                    await response.text();
+                } else {
+                    body = await getResponseBody(response, args.responseType);
+                }
+            } catch (error) {
+                if (!(error instanceof NonJsonResponseError)) throw error;
+                return {
+                    ok: false,
+                    error: { reason: "non-json", statusCode: error.statusCode, rawBody: error.rawBody },
+                    rawResponse: toRawResponse(response),
+                };
+            }
             return {
                 ok: true,
                 body: body as R,

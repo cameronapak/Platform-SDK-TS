@@ -11,7 +11,7 @@ import {
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { prepareOpenapi, replaceExactly } from './generation.mjs';
+import { adaptResponseParsing, prepareOpenapi, replaceExactly } from './generation.mjs';
 
 const FORGE_REPOSITORY = 'https://github.com/cloudflare/forge.git';
 const FORGE_COMMIT = '00b8ede867530f8891fe4124b2f5f20ee8d0b05e';
@@ -207,7 +207,7 @@ function adaptGeneratedSdk(directory) {
       ) {
         source = replaceExactly(source, 'Request = {},', 'Request,', 2, path);
       }
-      writeFileSync(path, source);
+      writeFileSync(path, adaptResponseParsing(source, path));
     }
   }
 

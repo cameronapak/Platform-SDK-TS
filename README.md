@@ -5,6 +5,8 @@
 
 This repository explores language SDK generation for the YouVersion Platform API from the bundled OpenAPI specification using [Cloudflare Forge](https://github.com/cloudflare/forge). It contains TypeScript, Python, Go, Rust, and PHP Platform SDKs and a TypeScript React Query SDK add-on.
 
+The separate [Platform CLI](packages/cli/README.md) exposes all 33 API operations as generated `yvp` commands. It supports local packed installation, typed inputs, write confirmation, and explicit sensitive-output selection. Like the SDKs, it is experimental, unofficial, and unpublished.
+
 ## Requirements
 
 - TypeScript: Node.js 22 or newer and pnpm.
