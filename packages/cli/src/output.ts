@@ -31,15 +31,26 @@ export function human(value: string): string {
 process.stdout.on('error', () => {});
 process.stderr.on('error', () => {});
 
-async function deliver(stream: NodeJS.WriteStream, value: string): Promise<void> {
-  await new Promise<void>((resolve, reject) => stream.write(value, (error) => error ? reject(error) : resolve()));
+async function deliver(stream: NodeJS.WriteStream, value: string, signal: AbortSignal): Promise<void> {
+  signal.throwIfAborted();
+  let aborted: (() => void) | undefined;
+  try {
+    await new Promise<void>((resolve, reject) => {
+      aborted = () => reject(signal.reason);
+      signal.addEventListener('abort', aborted, { once: true });
+      stream.write(value, (error) => error ? reject(error) : resolve());
+    });
+    signal.throwIfAborted();
+  } finally {
+    if (aborted) signal.removeEventListener('abort', aborted);
+  }
 }
 
-export async function write(stream: NodeJS.WriteStream, value: string): Promise<void> {
-  await deliver(stream, guardText(value));
+export async function write(stream: NodeJS.WriteStream, value: string, signal: AbortSignal): Promise<void> {
+  await deliver(stream, guardText(value), signal);
 }
 
-export async function json(stream: NodeJS.WriteStream, value: unknown): Promise<void> {
+export async function json(stream: NodeJS.WriteStream, value: unknown, signal: AbortSignal): Promise<void> {
   // Guard the data, not serialized syntax (a credential may contain punctuation).
-  await deliver(stream, `${JSON.stringify(guard(value))}\n`);
+  await deliver(stream, `${JSON.stringify(guard(value))}\n`, signal);
 }

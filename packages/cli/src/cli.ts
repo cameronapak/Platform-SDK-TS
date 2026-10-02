@@ -55,14 +55,16 @@ Interrupted writes after dispatch can have unknown outcomes. Check before retryi
 }
 
 async function main(args: string[]) {
-  if (args.length === 1 && args[0] === '--version') return write(process.stdout, '0.1.0\n');
-  if (args.length === 1 && args[0] === 'catalog') return json(process.stdout, operations);
   const operation = operations.find((entry) => entry.command[0] === args[0] && entry.command[1] === args[1]);
+  if ((args.length === 1 && args[0] === '--version') || (operation && args.slice(2).includes('--version'))) {
+    return write(process.stdout, '0.1.0\n', controller.signal);
+  }
+  if (args.length === 1 && args[0] === 'catalog') return json(process.stdout, operations, controller.signal);
   if (operation && args.slice(2).includes('--help')) {
-    return write(process.stdout, help(operation));
+    return write(process.stdout, help(operation), controller.signal);
   }
   if (args.length === 0 || (args.length === 1 && args[0] === '--help')) {
-    return write(process.stdout, `Experimental, unofficial Platform CLI\nUsage: yvp <resource> <action> [options]\nyvp catalog\n${operations.map((entry) => `  ${entry.command.join(' ')} [${entry.kind}]`).join('\n')}\n`);
+    return write(process.stdout, `Experimental, unofficial Platform CLI\nUsage: yvp <resource> <action> [options]\nyvp catalog\n${operations.map((entry) => `  ${entry.command.join(' ')} [${entry.kind}]`).join('\n')}\n`, controller.signal);
   }
   if (!operation) throw new UsageError('Unknown command. Use yvp catalog or --help.');
   selected = operation;
@@ -114,11 +116,11 @@ async function main(args: string[]) {
   const redacted = operation.sensitive && !values['show-sensitive'];
   const empty = rawResponse.status === 204 || data === undefined;
   rendering = true;
-  if (values.output === 'text') return write(process.stdout, empty ? '' : data as string);
+  if (values.output === 'text') return write(process.stdout, empty ? '' : data as string, controller.signal);
   await json(process.stdout, { operationId: operation.operationId, status: rawResponse.status,
     kind: empty ? 'empty' : operation.response, data: redacted || empty ? null : data ?? null,
     ...(operation.redirect ? { location: values['show-sensitive'] ? rawResponse.headers.get('location') : null } : {}),
-    ...(redacted ? { redacted: true } : {}) });
+    ...(redacted ? { redacted: true } : {}) }, controller.signal);
 }
 
 try { await main(process.argv.slice(2)); } catch (error) {
@@ -126,18 +128,21 @@ try { await main(process.argv.slice(2)); } catch (error) {
   const status = !cancellation && error instanceof YouVersionPlatformError ? error.statusCode : undefined;
   const errorClasses = ['YouVersionPlatformError', 'YouVersionPlatformTimeoutError', 'BadRequestError', 'UnauthorizedError', 'NotFoundError', 'UnprocessableEntityError'];
   const errorClass = error instanceof Error && errorClasses.includes(error.constructor.name) ? error.constructor.name : undefined;
-  const message = cancellation === 'deadline' ? 'Execution deadline exceeded.' : cancellation ? 'Command interrupted.'
+  const message = cancellation === 'deadline' ? 'Execution deadline exceeded.' : cancellation ? received
+    ? 'Output delivery interrupted; the result was received.' : 'Command interrupted.'
     : error instanceof UsageError ? error.message : rendering ? 'Output delivery failed; the result was received.'
     : 'Platform SDK request failed. Check credentials, permissions, and command inputs.';
   const unknown = selected?.kind === 'write' && dispatched && !received && (cancellation || status === undefined);
   const diagnostic = { error: message, ...(selected ? { operationId: selected.operationId } : {}),
     ...(status !== undefined ? { status } : {}), ...(errorClass ? { errorClass } : {}),
     ...(unknown ? { outcome: 'unknown', detail: 'The request may have been applied. Do not retry without checking its outcome.' } : {}) };
-  if (output === 'text') await write(process.stderr, `${human(message)}${status === undefined ? '' : ` HTTP ${status}.`}${errorClass ? ` ${errorClass}.` : ''}\n`).catch(() => { process.exitCode = 1; });
-  else await json(process.stderr, diagnostic).catch(() => { process.exitCode = 1; });
+  // Signal diagnostics are best effort; a blocked stderr must not delay shutdown.
+  const diagnosticSignal = controller.signal.aborted ? AbortSignal.timeout(100) : controller.signal;
+  if (output === 'text') await write(process.stderr, `${human(message)}${status === undefined ? '' : ` HTTP ${status}.`}${errorClass ? ` ${errorClass}.` : ''}\n`, diagnosticSignal).catch(() => { process.exitCode = 1; });
+  else await json(process.stderr, diagnostic, diagnosticSignal).catch(() => { process.exitCode = 1; });
 } finally {
   process.removeListener('SIGINT', interrupt);
   process.removeListener('SIGTERM', terminate);
-  // All output callbacks have completed. SDK timers must not delay CLI shutdown.
-  process.exit(process.exitCode ?? 0);
+  // Output has completed or been interrupted. SDK timers must not delay shutdown.
+  process.exit(cancellation === 'SIGINT' ? 130 : cancellation === 'SIGTERM' ? 143 : process.exitCode ?? 0);
 }

@@ -50,6 +50,18 @@ test('CLI generation is deterministic and rejects unreviewed drift', async (t) =
   await assert.rejects(generate(['--approve-contract']), (error) => /unsupported schema keyword/.test(error.stderr));
   await writeFile(specPath, specification);
 
+  const requestPath = join(temporary, 'src/generated/api/resources/highlights/client/requests/V1HighlightsCollectionPostRequest.ts');
+  const requestSource = await readFile(requestPath, 'utf8');
+  const narrowed = requestSource.replace('bible_id: number;', 'bible_id: string;');
+  assert.notEqual(narrowed, requestSource);
+  await writeFile(requestPath, narrowed);
+  for (const args of [[], ['--check']]) {
+    await assert.rejects(generate(args), (error) => /contract changed/.test(error.stderr));
+  }
+  assert.equal(await readFile(join(temporary, 'packages/cli/contract.sha256'), 'utf8'), approved);
+  assert.equal(await readFile(output, 'utf8'), original);
+  await writeFile(requestPath, requestSource);
+
   const mapPath = join(temporary, 'src/generated/sdk-map.json');
   const map = JSON.parse(await readFile(mapPath, 'utf8'));
   map['bibles.collection_get'].path = '/wrong';

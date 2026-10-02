@@ -66,6 +66,19 @@ test('installed Platform CLI', async (t) => {
     assert.match((await run(['--help'])).stdout, /unofficial/i);
   });
 
+  await t.test('operation version requests never validate credentials, consume stdin, or dispatch writes', async () => {
+    const { calls, url } = await fixture({ status: 204 });
+    const env = { YOUVERSION_APP_KEY: 'version-app', YOUVERSION_ACCESS_TOKEN: 'version-oauth' };
+    const deletion = await run(['highlights', 'resource-delete', '--bible-id', '206', '--passage-id-path', 'PSA.23.4',
+      '--base-url', url, '--yes', '--version'], env);
+    assert.equal(deletion.code, 0, deletion.stderr);
+    assert.equal(deletion.stdout.trim(), '0.1.0');
+    assert.equal(calls.length, 0);
+    const issuance = await run(['data-exchange', 'token-post', '--body-stdin', '--yes', '--version']);
+    assert.equal(issuance.code, 0, issuance.stderr);
+    assert.equal(issuance.stdout.trim(), '0.1.0');
+  });
+
   await t.test('help explains inputs, consent, credentials, output, and exit semantics', async () => {
     const help = await run(['highlights', 'collection-post', '--help']);
     for (const term of ['--body-file', '--body-stdin', 'request_id', 'highlight', 'color', '--yes',
@@ -415,5 +428,43 @@ test('installed Platform CLI', async (t) => {
     assert.match(JSON.parse(stderr).error, /Output delivery failed; the result was received/);
     assert.equal(JSON.parse(stderr).outcome, undefined);
     assert.equal(calls.length, 1);
+  });
+
+  await t.test('real signals interrupt backpressured JSON and text delivery after receiving the result', async (t) => {
+    for (const output of ['json', 'text']) for (const [signal, code] of [['SIGINT', 130], ['SIGTERM', 143]]) {
+      await t.test(`${output} ${signal}`, async () => {
+        const payload = 'x'.repeat(2 * 1024 * 1024);
+        const { calls, url } = await fixture(output === 'json' ? { status: 201, body: { token: payload } } : { status: 200, text: payload });
+        const file = join(consumer, 'blocked-delivery.json');
+        await writeFile(file, JSON.stringify({ requested_permissions: ['highlights'] }));
+        const args = output === 'json'
+          ? ['data-exchange', 'token-post', '--body-file', file, '--yes', '--show-sensitive']
+          : ['fonts', 'stylesheet-get', '--font-id', '17', '--output', 'text'];
+        const child = spawn(bin, [...args, '--base-url', url], {
+          cwd: consumer, env: { PATH: process.env.PATH, HOME: temporary, YOUVERSION_APP_KEY: 'blocked-app', YOUVERSION_ACCESS_TOKEN: 'blocked-oauth' },
+        });
+        let stderr = '', timedOut = false;
+        child.stderr.on('data', (chunk) => { stderr += chunk; });
+        // Leave stdout paused so the pipe fills and its write callback stays pending.
+        const delivering = new Promise((resolve) => child.stdout.once('readable', resolve));
+        child.once('exit', () => child.stdout.resume());
+        const done = new Promise((resolve) => child.once('close', (code) => resolve(code)));
+        await delivering;
+        const timer = setTimeout(() => {
+          timedOut = true;
+          child.kill('SIGKILL');
+          child.stdout.resume();
+        }, 2000);
+        child.kill(signal);
+        const actual = await done;
+        clearTimeout(timer);
+        assert.equal(timedOut, false, 'signal must interrupt the pending write callback');
+        assert.equal(actual, code, stderr);
+        const message = output === 'json' ? JSON.parse(stderr).error : stderr;
+        assert.match(message, /delivery interrupted.*result was received/i);
+        if (output === 'json') assert.equal(JSON.parse(stderr).outcome, undefined);
+        assert.equal(calls.length, 1, 'received writes must not be dispatched again');
+      });
+    }
   });
 });

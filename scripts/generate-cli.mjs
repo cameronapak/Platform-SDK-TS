@@ -120,6 +120,8 @@ for (const id of Object.keys(sdkMap).sort()) {
   if (entry.requestType) {
     const requestPath = join(dirname(clientPath), 'requests', `${entry.requestType}.ts`);
     const requestSource = readFileSync(requestPath, 'utf8');
+    // Include nested namespace declarations, not only top-level property references.
+    bindingSources[id].requestSource = requestSource;
     const requestAst = ts.createSourceFile(requestPath, requestSource, ts.ScriptTarget.Latest, true);
     const declaration = requestAst.statements.find((node) => ts.isInterfaceDeclaration(node) && node.name.text === entry.requestType);
     if (!declaration || declaration.heritageClauses) fail(`${id}: unsupported request declaration`);
